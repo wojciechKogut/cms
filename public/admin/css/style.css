@@ -1,0 +1,58 @@
+
+html, body
+{
+    height: 100%;
+    margin-bottom:0 !important;
+    
+}
+
+div.mystyle
+{
+    height: 100%;
+    width: 100%; 
+    background-color: #fff;
+    margin: 0;
+}
+
+.required
+{
+    border: 3px solid #FF3366;
+}
+
+
+.btn-file
+{
+    border: 1px solid #3399CC;
+    background-color: #3399CC;
+    color: #fff;
+}
+
+.activee
+{
+    color:#fff !important;
+    font-size: 1.1em;
+}
+
+.required-star
+{
+    color:red;
+}
+
+ul.collapse li a
+{
+    color: #3399CC;
+}
+
+
+.toggle-sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top:0;
+    left:0;
+    z-index:1;
+    overflow-y: hidden;
+    transition: 0.5s;
+}
+
+

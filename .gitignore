@@ -1,0 +1,8 @@
+nbproject/
+.htaccess
+composer.lock
+public/admin/vendor/
+public/fonts/
+public/nbproject/
+vendor/
+app/config/config.php
