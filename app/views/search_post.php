@@ -12,9 +12,9 @@
         
         
         <div class="col-md-7 col-sm-10 col-xs-7 col-lg-6 ml-auto" style="background-color:#fff;">
-          <h1 class="my-4">Page Heading
+          <!-- <h1 class="my-4">Page Heading
             <small>Secondary Text</small>
-          </h1>
+          </h1> -->
 
           <!-- Blog Post -->
           <?php 
@@ -42,7 +42,7 @@
           <ol>
           <?php foreach ($search as $post): ?>
           
-              <li><a href="<?php echo ROOT ?>users/post/<?php echo $post->id ?>">Post title: <?php echo $post->post_title ?></a>
+              <li><a href="<?php echo ROOT ?>users/post/<?php echo $post->slug ?>">Post title: <?php echo $post->post_title ?></a>
 
           <?php endforeach; ?>
           </ol>

@@ -16,11 +16,11 @@
     <script>
       $(function() {
         $(".rslides").responsiveSlides({
-          auto: false,
+          auto: true,
           pager:true,
           nav: true,
           speed: 500,
-          maxwidth: 800,
+          maxwidth: 985,
           namespace: "centered-btns"
         });
       });

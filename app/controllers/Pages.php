@@ -16,6 +16,7 @@ class Pages extends Controller
         $this->categories = $this->model('category');
         $this->user       = $this->model('user');
         $this->comment    = $this->model('comment');
+        $this->likes      = $this->model('like');
     }
     
     
@@ -54,7 +55,8 @@ class Pages extends Controller
                         $this->comment->get_data()->count(),
                         $this->user->subscribers()->count(),
                         $this->posts->active_posts()->count(),
-                        $this->posts->draft_posts()->count()
+                        $this->posts->draft_posts()->count(),
+
                     ];
             $this->view('admin', $data);
         }

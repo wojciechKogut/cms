@@ -1,38 +1,44 @@
 <?php
 
-class Pagination {
+class Pagination
+{
 
     public $per_page;
     public $current_page;
     public $count;
 
-    public function __construct($per_page, $curent_page, $count) {
+    public function __construct($per_page, $curent_page, $count)
+    {
         $this->per_page = $per_page;
         $this->current_page = $curent_page == null ? 1 : $curent_page;
         $this->count = ceil($count / $per_page);
     }
-    
-    
 
-    public function show_pagination() {
+
+
+    public function show_pagination()
+    {
         return ($this->count == 1) ? false : true;
     }
-    
-    
 
-    public function next() {
+
+
+    public function next()
+    {
         return $this->current_page + 1;
     }
-    
-    
 
-    public function previous() {
+
+
+    public function previous()
+    {
         return $this->current_page - 1;
     }
-    
-    
 
-    public function has_next() {
+
+
+    public function has_next()
+    {
 
 
         if ($this->current_page < $this->count) {
@@ -40,21 +46,23 @@ class Pagination {
         } else
             return false;
     }
-    
-    
 
-    public function has_previous() {
+
+
+    public function has_previous()
+    {
         if ($this->current_page <= 1) {
             return false;
         } else {
             return true;
         }
     }
-    
+
 
 }
 
-class Form {
+class Form
+{
 
     public $form_values;
     public $error = [];
@@ -67,7 +75,8 @@ class Form {
     public $model;
     public $id;
 
-    public function __construct($form_role, $form_values, $files = [], $rules, $model, $id = "") {
+    public function __construct($form_role, $form_values, $files = [], $rules, $model, $id = "")
+    {
         $this->form_values = $form_values;
         $this->files = $files;
         $this->rules = $rules;
@@ -77,39 +86,43 @@ class Form {
         $this->id = $id;
     }
 
-    public function clean() {
+    public function clean()
+    {
         if (filter_has_var(INPUT_POST, "user_email")) {
             $email = filter_var($this->form_values["user_email"], FILTER_SANITIZE_EMAIL);
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->error["user_email"] = "Invalid email";
                 $this->style["user_email"] = "required";
+            } else {
+                unset($this->error["user_email"]);
             }
-//			else
-//			{
-//				unset($this->error["user_email"]);
-//			}
-////                        czy email istnieje
-//                        $email_count = $this->model->where('user_email',$this->form_values['user_email']);
-////                        czy uzytkownik istnieje
-//                        $user_name_count = $this->model->where('user_name',$this->form_values['user_name']);
-//
-//                        if($email_count->count() > 1)
-//                        {
-//                            $this->error["user_email"] = "Email exists";
-//                            $this->style["user_email"] = "required";
-//                        }
-//                        if ($user_name_count->count() > 1)
-//                        {
-//                            $this->error["user_name"] = "Username exists";
-//                            $this->style["user_name"] = "required";
-//                        }
+//                        czy email istnieje
+            $email_exists = $this->model->where('user_email', $this->form_values['user_email'])->get();
+//                        czy uzytkownik istnieje
+            $user_name_exists = $this->model->where('user_name', $this->form_values['user_name'])->get();
+
+            if ($email_exists->count() > 0) {
+                $this->error["email_exists"] = "Email exists";
+                $this->style["email_exists"] = "required";
+            }
+            if ($user_name_exists->count() > 0) {
+                $this->error["user_exists"] = "Username exists";
+                $this->style["user_exists"] = "required";
+            }
         }
-        
-        
+
+
         foreach ($this->form_values as $field => $value) {
-            $this->form_values[$field] = htmlspecialchars($value);
-            $this->form_values[$field] = strip_tags($value);
-            $this->form_values[$field] = filter_var($value, FILTER_SANITIZE_STRING);
+            
+            if($field != "post_content") {
+                $this->form_values[$field] = strip_tags($value);
+                $this->form_values[$field] = filter_var($value, FILTER_SANITIZE_STRING);
+                $this->form_values[$field] = htmlspecialchars($value);
+            } else {
+                $this->form_values[$field] = filter_var($value, FILTER_SANITIZE_STRING);
+                $this->form_values[$field] = htmlspecialchars($value);
+            }
+            
 
 
 
@@ -121,13 +134,15 @@ class Form {
         }
     }
 
-    public function form_rules() {
+    public function form_rules()
+    {
         foreach ($this->rules as $field => $rule) {
             $this->required_fields($field, $rule);
         }
     }
 
-    public function required_fields($field, $rule) {
+    public function required_fields($field, $rule)
+    {
         foreach ($rule as $key => $value) {
             if ($key == "required" && $value == true) {
                 if (empty($this->form_values[$field])) {
@@ -142,9 +157,10 @@ class Form {
             }
         }
     }
-    
 
-    public function image($file) {
+
+    public function image($file)
+    {
         switch ($file["error"]) {
             case UPLOAD_ERR_OK:
                 $this->set_up_file($file);
@@ -172,9 +188,10 @@ class Form {
                 break;
         }
     }
-    
 
-    public function set_up_file($file) {
+
+    public function set_up_file($file)
+    {
 
 
         if ($this->check_err()) {
@@ -188,7 +205,8 @@ class Form {
         }
     }
 
-    public static function delete_tmp_img() {
+    public static function delete_tmp_img()
+    {
 
 
         $dir = INCLUDES_PATH . "tmp";
@@ -201,10 +219,11 @@ class Form {
             unlink($dir . DS . $file);
         }
     }
-    
-    
 
-    public function img_after_submit() {
+
+
+    public function img_after_submit()
+    {
         $dir = INCLUDES_PATH . "tmp";
         if (!$fd = opendir($dir)) {
             exit("Cannot open directory");
@@ -215,11 +234,12 @@ class Form {
             $this->tmp_file = $file;
         }
     }
-    
-    
-    
 
-    public function check_err() {
+
+
+
+    public function check_err()
+    {
         foreach ($this->error as $field => $value) {
             if (!empty($value)) {
                 return false;
@@ -228,10 +248,11 @@ class Form {
 
         return true;
     }
-    
-    
 
-    public function proccess() {
+
+
+    public function proccess()
+    {
 
         $this->clean();
         $this->form_rules();
@@ -334,44 +355,74 @@ class Form {
 
 
 
-class Pager {
+class Pager
+{
 
     public $per_page;
     public $model;
     public $nr_page;
-    public $link;
-    
-    
+    public $adm;
+    public $user_id;
 
-    public function __construct($per_page, $model, $nr_page, $link = null) {
+
+    public function __construct($per_page, $model, $nr_page, $adm = null, $user_id = null)
+    {
         $this->per_page = $per_page;
         $this->model = $model;
         $this->nr_page = $nr_page;
-        $this->link = $link;
+        // $this->link = $link;
+        $this->adm = $adm;
+        $this->user_id = $user_id;
     }
-    
-    
 
-    public function offset() {
+
+
+    public function offset()
+    {
         if ($this->nr_page == null) {
             return ($this->per_page * 1) - $this->per_page;
         } else {
             return ($this->per_page * $this->nr_page) - $this->per_page;
         }
     }
-    
-    
-    
-    
 
-    public function data_per_page() {
+
+
+
+
+    public function data_per_page()
+    {
         $offset = $this->offset();
 
-        if (strtolower(get_class($this->model)) == "post") {
+        if (strtolower(get_class($this->model)) == "post" && $this->adm) {
+            return $this->model::orderBy('id', 'desc')->offset($offset)->limit(POSTS_PER_PAGE)->get();
+        } else if (strtolower(get_class($this->model)) == "post") {
             return $this->model::orderBy('id', 'desc')->where("post_status", "published")->offset($offset)->limit(POSTS_PER_PAGE)->get();
+        } else if (strtolower(get_class($this->model)) == "post" && !$this->adm) {
+            return $this->model::orderBy('id', 'desc')->where("post_user_id", $this->user_id)->offset($offset)->limit(POSTS_PER_PAGE)->get();
         }
 
+
         return $this->model::orderBy('id', 'desc')->offset($offset)->limit(POSTS_PER_PAGE)->get();
+    }
+
+    public function filtrData($term) {
+        $offset = $this->offset();
+        return $this->model::where("post_title","like","%" . $term . "%")->offset($offset)->limit(POSTS_PER_PAGE)->get();
+    }
+
+    public function sortByQuery($sortBy) {
+        $offset = $this->offset();
+        if($sortBy == "titleDesc") {
+            return $this->model::orderByDesc("post_title")->offset($offset)->limit(POSTS_PER_PAGE)->get();  
+        } else if($sortBy == "titleAsc") {
+            return $this->model::orderBy("post_title")->offset($offset)->limit(POSTS_PER_PAGE)->get();  
+        } else if($sortBy == "authorDesc") {
+            return $this->model::orderByDesc("post_author")->offset($offset)->limit(POSTS_PER_PAGE)->get(); 
+        } else if($sortBy == "authorAsc") {
+            return $this->model::orderBy("post_author")->offset($offset)->limit(POSTS_PER_PAGE)->get(); 
+        }
+         
     }
 
 }
@@ -379,13 +430,17 @@ class Pager {
 
 
 
-function redirect($path) {
+
+function redirect($path)
+{
 
     return header("location: " . $path);
 }
 
 
 
-function truncate($post_content) {
-    return $post_content =  (strlen($post_content)>100) ? substr($post_content,0,200)." (..)" : $post_content; 
+function truncate($post_content)
+{
+    return $post_content = (strlen($post_content) > 100) ? substr($post_content, 0, 200) . " (..)" : $post_content;
 }
+

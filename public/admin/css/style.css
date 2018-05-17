@@ -56,3 +56,16 @@ ul.collapse li a
 }
 
 
+.sortDownArrow {
+    position:absolute;
+    top:70%;
+    transform:translateY(-50%);
+}
+
+.sortUpArrow {
+    position:absolute;
+    top:30%;
+    transform:translateY(-50%);
+}
+
+

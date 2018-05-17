@@ -371,12 +371,11 @@ function like() {
         type: "post",
         data: data,
         success: function(data1) {
-            console.log(data1)
-               
+               if(data1.userId != 0) {
                     $(".fa-thumbs-o-up").css('cursor', 'default');
                     $(".fa-thumbs-o-up").addClass("like");
-                    $(".fa-thumbs-o-up").text('(' + data1.likesToPost + ')');
-               
+                    $(".dropdown-toggle").text('(' + data1.likesToPost + ')');
+               }
         },
         error: function(err) {
             console.log(err);
@@ -385,3 +384,6 @@ function like() {
     
 }
 
+function showLikes() {
+    
+}

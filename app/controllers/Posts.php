@@ -12,14 +12,12 @@ class Posts extends Controller
 
     public function __construct()
     {
-        $this->posts      = $this->model('post');
-        $this->session    = $this->model("session"); 
-        $this->user       = $this->model('user');
-        $this->comments   = $this->model('comment');
-        $this->categories = $this->model('category');
-        $this->comment_reply = $this->model('comment_reply');
-         
-         
+        $this->posts         = $this->model('post');
+        $this->session       = $this->model("session"); 
+        $this->user          = $this->model('user');
+        $this->comments      = $this->model('comment');
+        $this->categories    = $this->model('category');
+        $this->comment_reply = $this->model('comment_reply');     
     }
     
 
@@ -29,34 +27,82 @@ class Posts extends Controller
          {
              redirect(ROOT);
          }
+
         
-        $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id);
 
         if(!$this->user->isAdmin())
         {
             $user = $this->user->find_by_id($_SESSION['id']);
             $user_posts = $user->posts;
             $count_rows = $user_posts->count(); 
+            $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
             $pagination = new Pagination(5, $id, $count_rows);
             $data = [$user_posts,$pagination, $this->session->message];
             $this->view('sub_posts', $data);
         }
         else
         {
+            /** filtrowanie tabeli */
+            if($_SERVER['REQUEST_METHOD'] == "POST") {
+                if(isset($_POST['reset'])) {
+                    $all_posts = $this->posts->find_all_posts();
+                    $count_rows = $all_posts->count();
+                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $data = [$pager->data_per_page(),$pagination, $this->session->message];
+                    $this->view('adm_posts', $data);
+                } else {
+                    $all_posts = $this->filtrTable();
+                    $count_rows = $all_posts->count();
+                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $data = [$pager->filtrData($_POST['searchTerm']),$pagination, $this->session->message];
+                    $this->view('adm_posts', $data);
+                }     
+            } else {
+                $all_posts = $this->posts->find_all_posts();
+                $count_rows = $all_posts->count();
+                $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                $pagination = new Pagination(5, $id, $count_rows);  
+                $data = [$pager->data_per_page(),$pagination, $this->session->message];
+                $this->view('adm_posts', $data);
+            }
             
-//            $posts_per_page = $pager->data_per_page();
-            $all_posts = $this->posts->find_all_posts();
-            $count_rows = $all_posts->count();
-            $pagination = new Pagination(5, $id, $count_rows);  
-            $data = [$all_posts,$pagination, $this->session->message];
-            $this->view('adm_posts', $data);
         }
         
 
     }
-    
-    
-    
+
+
+    public function sortBy($id,$sortBy) {
+        $all_posts = $this->posts->find_all_posts();
+        $count_rows = $all_posts->count();
+        $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+        $pagination = new Pagination(5, $id, $count_rows);  
+        if($sortBy == "titleDesc") {
+            $data = [$pager->sortByQuery("titleDesc"),$pagination, $this->session->message];
+            $this->view('adm_posts', $data);
+        } else if($sortBy == "titleAsc") {
+            $data = [$pager->sortByQuery("titleAsc"),$pagination, $this->session->message];
+            $this->view('adm_posts', $data);
+        } else if($sortBy == "authorDesc") {
+            $data = [$pager->sortByQuery("authorDesc"),$pagination, $this->session->message];
+            $this->view('adm_posts', $data);
+        } else if($sortBy == "authorAsc") {
+            $data = [$pager->sortByQuery("authorAsc"),$pagination, $this->session->message];
+            $this->view('adm_posts', $data);
+        }
+        
+        
+    }
+
+
+    public function filtrTable() {
+        if(isset($_POST['search'])) {
+            $term = $_POST['searchTerm'];
+            return $this->posts->searchTable($term);
+        }
+    }
     
 
     public function update($id) {
@@ -74,7 +120,9 @@ class Posts extends Controller
             $form = new Form("update_with_img", $_POST, $_FILES["post_image"], $rules, $the_post, $id);
 
             if ($form->proccess()) {
-                $the_post->update(['post_user_id'=>$_SESSION['id']]);
+                $generator = new Vnsdks\SlugGenerator\SlugGenerator;
+                $postTitle = $generator->generate($form->form_values['post_title']);
+                $the_post->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $the_post->id]);
                 $this->session->message("Post '" . $form->form_values["post_title"] . "' updated");
                 redirect(ROOT . "posts");
             }

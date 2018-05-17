@@ -97,11 +97,13 @@ class Users extends Controller {
 
 //        $the_post = $this->posts->find_by_id($id);
         $the_post = $this->posts::where('slug',$slug)->first();
+        $views = $the_post->post_views; $views++;
+        $the_post->update(['post_views'=>$views]);
         $user = $the_post->user;
         $reply_comment = $this->reply_comment->get_data();
         $recent_posts = $this->posts::orderBy('id', 'desc')->where("post_status", "published")->limit(5)->get();
         $like = $this->likes::where([['user_id','=', $user_id], ['post_id', '=', $the_post->id]])->first();
-        $likesToPost = $this->likes::where('post_id', $the_post->id);
+        $likesToPost = $this->likes::where('post_id', $the_post->id)->get();
         
 
         /* post category */
@@ -117,7 +119,8 @@ class Users extends Controller {
             $reply_comment,
             $recent_posts,
             $like,
-            $likesToPost->count()
+            $likesToPost->count(),
+            $likesToPost
         ];
 
 
@@ -151,6 +154,7 @@ class Users extends Controller {
                 redirect(ROOT . "pages/admin");
             }
         }
+        
 
         $data = [$form];
         $this->view('register', $data);
@@ -333,18 +337,21 @@ class Users extends Controller {
 
 
     public function like() {
-        
+        header("Content-Type: application/json");
         $data = [];
         if(isset($_POST)){
-            if($_POST['userId'] == 0) return;
+            if($_POST['userId'] == 0) {
+                $data['userId'] = 0;
+                echo json_encode($data);
+            }
             else {
                 try {
-                    header("Content-Type: application/json");
+                    
                     $like = $this->likes::where([['user_id','=', $_POST['userId']], ['post_id', '=', $_POST['postId']]])->first();
                     if(!$like) {  
                         $like = $this->likes::create(['user_id' => $_POST['userId'], 'post_id' => $_POST['postId'], 'count' => 1 ]);
                         $likesToPost = $this->likes::where('post_id', $_POST['postId'])->count();
-                        $data["user_id"] = $_POST['userId'];
+                        $data["userId"] = $_POST['userId'];
                         $data["likesToPost"] = $likesToPost;
                         echo json_encode($data);
                     }  

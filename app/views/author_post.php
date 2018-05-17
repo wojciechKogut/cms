@@ -10,8 +10,6 @@
     <!-- Blog Entries Column -->
     <div class="col-md-7 col-lg-6 ml-auto" style="background-color:#fff; padding-bottom: 7em; margin-bottom: 1em;">
 
-
-
           <?php
             $post        = $params[0];
             $id          = $params[1]; //id postu
@@ -23,7 +21,9 @@
             $reply_comment = $params[6];
             $recent      = $params[7];
             $like        = $params[8];       
-            $likesToPost = $params[9];
+            $numlikesToPost = $params[9];
+            $likesToPost = $params[10];
+
           ?>
           
           <div class="col-md-10">
@@ -38,46 +38,32 @@
                    <span class="ml-3">Category</span>  <b><a href="<?php echo ROOT."posts/post_cat/".$post['post_category_id'] ?>" style="color:<?php echo $post->category->color ?>"><?php echo !empty($post->category->cat_title) ? $post->category->cat_title : "Uncategorized" ; ?></a></b>
                </p>
                <hr>
-               <a href="<?php echo ROOT."users/post/".$post->id ?>">
+               <a href="#">
                     <img class="mb-5 img-fluid mx-auto" style="width: 100%; height: 25em;" src="<?php echo ROOT."images/upload_img/" ; ?><?php echo $post->post_image ;   ?>" alt="Card image cap">
                </a>
                
                <div class="col-md-10">
-               <input type="hidden" id="likesToPost" value="<?php echo $likesToPost ?>">
-                  <a href="javascript:void(0)"  style="cursor:<?php echo !isset($_SESSION['id']) ? "default" : "pointer" ?>" onclick="like();"><i  class="fa fa-thumbs-o-up mr-3 <?php echo ($like->user_id != 0 && $like->user_id == $_SESSION['id']) ? "like" : "" ?>">(<?php echo $likesToPost ?>)</i></a>
+               <input type="hidden" id="likesToPost" value="<?php echo $numlikesToPost ?>">
+                  <a href="javascript:void(0)"  style="cursor:<?php echo !isset($_SESSION['id']) ? "default" : "pointer" ?>; float:left" onclick="like();"><i  class="fa fa-thumbs-o-up mr-3 <?php echo ($like->user_id != 0 && $like->user_id == $_SESSION['id']) ? "like" : "" ?>"></i></a>
+                  <div class="dropdown">
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">(<?php echo $numlikesToPost ?>)</a>
+                      <ul class="dropdown-menu">
+                        <?php if($numlikesToPost > 0): ?>
+                            <?php foreach($likesToPost as $like): ?>
+                                <li class="dropdown-item"><?php echo $like->user->user_name ?></li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                      </ul>
+                </div>
                   <a href="javascript:void(0)"  style="cursor:<?php echo !isset($_SESSION['id']) ? "default" : "pointer" ?>" onclick="dislike();"><i  class="fa fa-thumbs-o-down"></i></a>
                 </div>
                <hr>
-               <p class="text-justify mb-4"><?php echo $post->post_content; ?></p>
+               <div class="text-justify mb-4 "><?php echo html_entity_decode($post->post_content); ?></div>
           </div> 
             
           <div class="col-md-10" id="warning"></div>
           
           <?php if(!isset($_SESSION['id'])): ?>    
-          
-          <!-- <div class="col-md-10">
-              <div class="form-group">
-                  <form action="" method="post" id="myForm">
-                      <div class="well">
-                          <div class="form-group">
-                              <label for="author">Author</label>
-                              <input type="text" name="comment_author"  id="comment_author" class="form-control">
-                          </div>
-                          <div class="form-group">
-                              <label for="email">Email</label>
-                              <input type="email" name="comment_email" id="comment_email" class="form-control">
-                          </div>
-                          <h4>Leave a Comment:</h4>
-                          <div class="form-group">
-                              <textarea  class="form-control" name="comment_content" id="comment_content" rows="3"></textarea>
-                          </div>
-
-                          <button type="button" onclick="ajax()" name="create_comment" id="create_comment" class="btn btn-primary">Submit</button>
-                      </div>
-                  </form>
-              </div>
-          </div>  -->
-          
            <?php else: ?>
           <div class="col-md-10">
                   <div class="form-group">
@@ -87,9 +73,7 @@
                               <div class="form-group">
                                   <textarea  class="form-control" name="comment_content" id="comment_content" rows="3"></textarea>
                               </div>
-
                               <button type="button" onclick="ajax()" name="create_comment" id="create_comment" class="btn btn-primary">Submit</button>
-
                           </div>
                       </form>
                   </div>
@@ -99,9 +83,6 @@
           <input type="hidden"  value="<?php echo isset($_SESSION['id']) ? $_SESSION['id'] : 0  ?>" id="user_id">
           <input type="hidden"  value="<?php echo $id; ?>" id="post_id">
    <ul id="update">
-
-       
-
 
   <?php foreach($the_comment as $comment): ?>  
        
@@ -117,8 +98,6 @@
                           <h4 class=""> <?php echo $comment->comment_author; ?>
                               <small><?php echo $comment->created_at->diffForHumans(); ?> 
                                   <i style="cursor: pointer"  class="fa fa-reply reply-icon" onclick="reply(<?php echo $comment->id ?>)"></i>
-                                  <!-- <i style="cursor: pointer" class="fa fa-thumbs-o-up"></i>
-                                  <i style="cursor: pointer" class="fa fa-thumbs-o-down"></i> -->
                               </small>
                           </h4>
                           
@@ -135,10 +114,8 @@
                                                 <span><?php echo $reply->created_at->diffForHumans() ?></span>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
-                                    </ul>
-                                 
-                           </ul>
-                              
+                                    </ul>   
+                           </ul>            
                       </div>
          <?php if(isset($_SESSION['id'])): ?>    
                  <form style="height:3rem;" id="reply_form-<?php echo $comment->id ?>" method="post" action="">
@@ -147,11 +124,7 @@
 <?php endif; ?>
               </div>
             </li> 
-
-        
-
-       
-       
+ 
  <?php endforeach; ?>
        
     </ul>
@@ -161,11 +134,8 @@
 
         <!-- Sidebar Widgets Column -->
         <div class="col-md-3 col-lg-2 mr-auto" style="background-color: #fff; padding-bottom: 7em; margin-bottom: 1em;">
-
             <!-- Search Widget -->
-            
             <?php include "includes/search.php"; ?>
-  
           <!-- Categories Widget -->
           <div class="card my-4">
               <h5 class="card-header mt-0">Categories</h5>
@@ -183,9 +153,7 @@
                       </div>
                   </div>
               </div>
-          </div>
-          
-          
+          </div>        
           <div class="card my-5">
               <h5 class="card-header mt-0">Recent Activity</h5>
               <div class="card-body" style="padding:0">
@@ -207,7 +175,6 @@
                   </div>
               </div>
           </div>
-
         </div>
 
 </div>

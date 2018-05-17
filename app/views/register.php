@@ -6,6 +6,10 @@
 if(isset($_SESSION['user_name'])) header("location: ".ROOT."/pages/admin/");
 
 $form = $params[0];
+if(!empty($form->error['user_exists'])) $user_exists = $form->error['user_exists']; 
+else $user_exists = "";
+if(!empty($form->error['email_exists']))  $email_exists = $form->error['email_exists'];
+else $email_exists = "";
 
 ?>
 
@@ -24,9 +28,9 @@ $form = $params[0];
                             autocomplete="on" 
                             value = "">
                             <?php if(!empty($form->error['user_name'])): ?>
-                            <div style="color:#FF3366"> <?php echo $form->error['user_name'] ?></div>
+                            <div style="color:#FF3366"> <?php echo $form->error['user_name'] ?>
                              <?php endif; ?>
-                           
+                             <div style="color:#FF3366"><?php echo $user_exists ?></div>
                             
                             <label for="email" class="sr-only">Email</label>
                             <input type="email" name="user_email" id="email" class="form-control <?php echo !empty($form->style['user_email']) ? $form->style['user_email'] : "";  ?>" placeholder="somebody@example.com" 
@@ -36,7 +40,7 @@ $form = $params[0];
                             <?php if(!empty($form->error['user_email'])): ?>
                             <div style="color:#FF3366"> <?php echo $form->error['user_email'] ?></div>
                              <?php endif; ?>
-          
+                             <div style="color:#FF3366"><?php echo $email_exists ?></div>
                             <label for="password" class="sr-only">Password</label>
                             <input type="password" name="user_password" id="password" class="form-control" placeholder="Password">
                             <p class="info"></p>

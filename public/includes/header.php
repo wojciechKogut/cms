@@ -22,8 +22,8 @@
     <link href="<?php echo ROOT ?>css/404.css" rel="stylesheet">
     <link href="<?php echo ROOT ?>css/font-awesome.min.css" rel="stylesheet">
     <script src="<?php echo ROOT; ?>admin/vendor/jquery/jquery.min.js"></script>
-    
-     
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+    <script src="https://cdn.ckeditor.com/4.9.2/standard/ckeditor.js"></script>
     
   </head>
   

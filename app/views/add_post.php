@@ -101,69 +101,7 @@ $form       = $params[2];
                              <div style="color:#FF3366"><?php echo (!empty($form->error['post_category_id'])) ? $form->error['post_category_id'] : "" ?></div>
                         </div>           
                     </div>  
-                    
-<!--                    
-
-                    <div class="form-group">
-                        <label for="post_user" >User</label>
-                        <div class="col-md-2 p-0 mb-3">
-                            <select class="form-control" name="post_user_id" class="selectpicker" id="user">
-                        
-                        <?php // if(!empty($form->form_values["post_author"])) : ?> 
-                            
-                            
-                            <?php
-                            
-//                            foreach ($users as $user)
-//                            {
-//                                if ($form->form_values["post_user_id"] == $user->id)
-//                                {
-//                                    echo "<option value='$user->id'>$user->user_name</option>";
-//                                }
-//                            }
-//                            foreach ($users as $user)
-//                            {
-//                                if ($_SESSION['user_name'] != $user->user_name)
-//                                {
-//                                    echo "<option value='$user->id'>$user->user_name</option>";
-//                                }
-//                            }
-//                            
-////                       
-                            
-                            ?>
-                            
-                        <?php // else: ?>    
-                                
-                        <?php
-                                             
-//                        foreach ($users as $user)
-//                        {
-//                            if ($_SESSION['user_name'] == $user->user_name)
-//                            {
-//                                echo "<option value='$user->id'>$user->user_name</option>";
-//                            }
-//                        }
-//                        foreach ($users as $user)
-//                        {
-//                            if ($_SESSION['user_name'] != $user->user_name)
-//                            {
-//                                echo "<option value='$user->id'>$user->user_name</option>";
-//                            }
-//                        }
-//                        
-//                        
-                        
-                        ?>
-                        <?php // endif; ?>
-                            
-                       
-                        </select>
-                        </div>
-                    </div>-->
-                    
-                    
-                    
+                
                     
                     <div class="form-group">
                         <label for="status">Status</label>

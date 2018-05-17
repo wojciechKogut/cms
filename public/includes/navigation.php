@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" style="position: absolute; top: 0">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
 
         <a class="navbar-brand" href="<?php echo ROOT ?>">Front</a>
@@ -28,11 +28,11 @@
               <a class="nav-link" href="<?php echo ROOT ?>users/register">Registration</a>
               <?php endif; ?>
             </li>
-            <li class="nav-item">
-                <?php if(!isset($_SESSION['user_name'])): ?>
-              <a class="nav-link" href="<?php echo ROOT ?>users/login">Login</a>
-              <?php endif; ?>
-            </li>
+            <!-- <li class="nav-item">
+                <?php //if(!isset($_SESSION['user_name'])): ?>
+              <a class="nav-link" href="<?php //echo ROOT ?>users/login">Login</a>
+              <?php //endif; ?>
+            </li> -->
             <li class="nav-item">
                 
               <?php  if(isset($_SESSION['user_name'])):  ?>
@@ -43,7 +43,7 @@
               
             </li>
             
-            <li class="nav-item mr-3">
+            <li class="nav-item mr-3" style="width:80px;">
               <a class="nav-link" href="<?php echo ROOT ?>posts/add_front">Add Post</a>
             </li>
             
@@ -89,7 +89,7 @@
                 <a href="#" style="padding:15px 0; color:grey" class="nav-link ml-2" role="button" id="#login-form" data-toggle="dropdown"><?php echo isset($_SESSION['user_name']) ? "User online: " . $_SESSION['user_name'] : "" ?></a>
             </li>
             
-            <li class="nav-item" style="position:relative; width:30rem;">
+            <li class="nav-item" style="position:relative; width:40rem;">
                     <div id="navbar-items">
                     <span id="city"></span>  
                     <img  id="weather_img" />

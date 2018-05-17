@@ -95,7 +95,7 @@
                         <tr>
                             <td><input type="checkbox" class="checkboxArray" value="<?php echo $post->id; ?>" name="checkboxes[]"></td>
                             <td><?php echo $post->id ; ?></td>
-                            <td><a href="<?php echo !empty($post->post_user_id) ? ROOT."users/post/$post->id" : "#" ?>"><?php echo $post->post_title ; ?></a></td>
+                            <td><a href="<?php echo !empty($post->post_user_id) ? ROOT."users/post/$post->slug" : "#" ?>"><?php echo $post->post_title ; ?></a></td>
                             <td><?php echo $post->get_post_author($post->post_user_id) ; ?></td>
                             <td><?php echo $post->post_date ; ?></td>
                             <td><img width='100' src="<?php echo ROOT."images/upload_img/" ; ?><?php echo ($post->post_image != "") ? $post->post_image : "placeholder.jpg" ; ?>"></td>

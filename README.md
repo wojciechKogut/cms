@@ -1,2 +1,0 @@
-# cms
-simple post blog
