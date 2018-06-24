@@ -1,14 +1,5 @@
 <?php if(!isset($_SESSION['user_name']))session_start(); ?>
-<?php 
-
-if(!isset($_SESSION['user_name']))
-{
-    header("location: ". ROOT);
-}
-
-
-
-?>
+<?php if(!isset($_SESSION['user_name'])) header("location: ". ROOT); ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +19,8 @@ if(!isset($_SESSION['user_name']))
   <link href="<?php echo ROOT ?>admin/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="<?php echo ROOT ?>admin/css/sb-admin.css" rel="stylesheet">
-   <link href="<?php echo ROOT ?>admin/css/style.css" rel="stylesheet">
+  <link href="<?php echo ROOT ?>admin/css/style.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
   
   <!--<link href="/page/admin/css/style.css" rel="stylesheet">-->
   <script src="https://cdn.ckeditor.com/4.9.2/standard/ckeditor.js"></script>

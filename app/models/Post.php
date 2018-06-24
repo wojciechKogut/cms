@@ -7,7 +7,7 @@ class Post extends Eloquent implements Model {
 
     public $table = "posts";
     public $fillable = ['post_category_id', 'post_user_id', 'post_title', 'post_author','post_date','post_image', 'post_content', 'post_tags', 'post_comment_count', 'post_status', 'post_views','slug'];
-    public $timestamps = true;
+    public $timestamps = ['updated_at','created_at'];
     
     
 
@@ -86,8 +86,14 @@ class Post extends Eloquent implements Model {
         }
     }
 
-    public function searchTable($term) {
-        return self::where("post_title","like","%" . $term . "%")->get();
+    public function searchTable($term,$isAdmin,$id = null) {
+        if($isAdmin) {
+            return self::where("post_title","like","%" . $term . "%")->get();
+        } else {
+            $userPosts = self::where("post_title","like","%" . $term . "%")->get();
+            return $userPosts->where("post_user_id", $id);
+        }
+        
     }
 
 }

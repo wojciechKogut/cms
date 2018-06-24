@@ -1,8 +1,4 @@
 
-<?php require_once "admin/includes/header.php"; ?>
-<?php require_once "admin/includes/navigation.php"; ?>
-
-
 <?php 
         $categories = $params[0];
         $pagination = $params[1];
@@ -10,7 +6,8 @@
         
 ?>
 
-
+<?php require_once "admin/includes/header.php"; ?>
+<?php require_once "admin/includes/navigation.php"; ?>
 
 <div class="content-wrapper">
     <div class="container-fluid">
@@ -21,39 +18,23 @@
         </div>
         <hr>
       <!-- Breadcrumbs-->
-      
-      <ol class="breadcrumb">
-          
-          
-        <?php if(!empty($msg)) :?>
-            
-            <div style="color:#fff" class="bg bg-success form-control"> <?php echo $msg ?></div>
-            
+      <ol class="breadcrumb">    
+        <?php if(!empty($msg)) :?>        
+            <div style="color:#fff" class="bg bg-success form-control"> <?php echo $msg ?></div>     
         <?php else: ?>
-            
-
             <li class="breadcrumb-item">
               <a href="#">Categories</a>
             </li>
-            <li class="breadcrumb-item active">My categories</li>
-            
-
+            <li class="breadcrumb-item active">My categories</li>    
         <?php endif; ?>
-        
-         
       </ol>
     </div> 
-    <div class="container mystyle">
+    <div class="col-lg-12 mystyle">
     <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          
+        <div class="col-md-12 col-sm-12 col-xs-12">     
         </div> 
-
-        
-        <hr>
-            
+        <hr>     
 <!--                   TABLE CATEGORIES                                                   -->            
-            
             <div class="col-md-12" id="showCategories">
                 <table class="table table-hover table-bordered mx-auto" id="categories" style="margin-bottom:5em;">
                     <thead>
@@ -78,18 +59,11 @@
                                 <td><a href="<?php echo ROOT."categories/update/".$category['id'] ?>">Edit</a></td>
                                 <td><a style="text-decoration: none;" rel="<?php echo $category['id'] ?>" href="#" class="deleteModal">Delete</a></td>
                              </tr>
-
-                        <?php  endforeach; ?>
-                        
-                        
+                        <?php  endforeach; ?>     
                     </tbody>
-                </table>
-                
-                
+                </table> 
                 <nav aria-label="Page navigation example">
-                            
                             <?php if($pagination->show_pagination()): ?>
-                            
                             <ul class="pagination">
                                 <li class="page-item">
                                     <?php if ($pagination->has_previous()): ?>
@@ -98,33 +72,21 @@
 
                                     <?php for ($i = 1; $i <= ceil($pagination->count); $i++): ?>
                                     <li class='page-item <?php echo $pagination->current_page == $i ? "active" : "" ?>'><a class='page-link' href='<?php echo ROOT ?>categories/index/<?php echo $i ?>'><?php echo $i ?></a></li>
-
-
-
                                 <?php endfor; ?> 
                                 <li class="page-item">
                                 <?php if ($pagination->has_next()): ?>
                                         <a class="page-link <?php echo $pagination->current_page == $i ? "active" : "" ?>" href="<?php echo ROOT ?>categories/index/<?php echo $pagination->next() ?>">Next</a></li>
                                 <?php endif; ?>
-                            </ul>
-                            
-                            <?php endif; ?>
-                            
+                            </ul> 
+                            <?php endif; ?>  
                         </nav>
-
             </div>
         </div>
     </div>
-         
-
    </div>
-    
-    
 <!--                   MODAL BOX                                                       -->
-    
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -143,21 +105,8 @@
 
         </div>
     </div>
-
 <!--                   MODAL BOX                                                       -->
-
-
-
-
-
-
-    
 </div>  
-
-
-
-
-
 <?php require_once "admin/includes/footer.php"; ?>
 
 

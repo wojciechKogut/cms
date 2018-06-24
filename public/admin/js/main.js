@@ -12,42 +12,31 @@ function verify() {
     var user_regExp = /[a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{3,}/;
     var pass_regExp = /.{4,20}/;
     var email_regExp = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-    var errors =
-        {
-            'username': '',
-            'password': '',
-            'email': ''
-        };
+    var errors = {
+                    'username': '',
+                    'password': '',
+                    'email': ''
+                };
 
 
     if (username == " " || username == null || !user_regExp.test(username)) {
         info[0].style.color = "red";
-        console.log(form['username'].style.border = 'red');
         errors['username'] = "Please fill username with at least 2 characters";
         info[0].innerHTML = errors['username'];
-    }
-    else {
-        info[0].innerHTML = " ";
-    }
-
-
+    } else  info[0].innerHTML = " ";
+    
     if (email == " " || email == null || !email_regExp.test(email)) {
         info[1].style.color = "red";
         errors['email'] = "Empty email or invalid syntax";
         info[1].innerHTML = errors['email'];
-    }
-    else {
-        info[1].innerHTML = " ";
-    }
+    } else info[1].innerHTML = " ";
+
 
     if (password == " " || password == null || !pass_regExp.test(password)) {
         info[2].style.color = "red";
         errors.password = "Empty password or to short";
         info[2].innerHTML = errors.password;
-    }
-    else {
-        info[2].innerHTML = " ";
-    }
+    } else info[2].innerHTML = " ";
 
     var i = 0;
 

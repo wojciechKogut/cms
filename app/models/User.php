@@ -72,6 +72,7 @@ class User extends Eloquent implements Model
     
 
     public function options($checkboxes, $options) {
+        die();
         foreach ($checkboxes as $key => $userId) {
             $this->id = $userId;
             $options = $_POST['options'];
@@ -97,7 +98,6 @@ class User extends Eloquent implements Model
     
 
     public function user_profile($id) {
-
         return $this->find_by_id($id);
     }
     
@@ -105,9 +105,15 @@ class User extends Eloquent implements Model
 
     public function delete_record($id) {
         $the_user = static::find($id);
+        $img = $the_user->user_image; 
+        if($img != "userplaceholder.png")  unlink(INCLUDES_PATH."images".DS."upload_img".DS. $img);
         $the_user->delete();
     }
+
+
     
-    
+    public function searchTable($term) {
+           return self::where("user_name","like","%" . $term . "%")->get();   
+    }
 
 }

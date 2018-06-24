@@ -5,16 +5,6 @@
           <i class="fa fa-area-chart"></i> Area Chart</div>
         <div class="card-body">
             
-            <?php 
-            $number_of_users = $params[0];
-            $number_of_posts = $params[1];
-            $number_of_categories = $params[2];
-            $number_of_comments = $params[3];
-            $numbers_of_sub = $params[4];
-            $number_of_active_posts = $params[5];
-            $number_of_draft_posts = $params[6];
-            ?>
-            
  <script type="text/javascript">  
      
       google.charts.load('current', {'packages':['corechart']});

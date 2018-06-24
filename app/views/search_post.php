@@ -84,12 +84,9 @@
                    ?>
                         <?php foreach ($categories as $category) : ?>
                       
-                              <li class="list-group-item" style="border:none"><b><a style="color:<?php echo $category['color']; ?>" href="<?php echo ROOT ?>posts/post_cat/<?php echo $category['id']?>"><?php echo $category['cat_title'] ?></a></b></li>
+                              <li class="list-group-item" style="border:none"><b><a style="color:<?php echo $category['color']; ?>" href="<?php echo ROOT ?>posts/post_cat/<?php echo $category['slug']?>"><?php echo $category['cat_title'] ?></a></b></li>
 
                         <?php endforeach; ?> 
-                
-             
-                    
                   </ul>
                 </div>
               </div>

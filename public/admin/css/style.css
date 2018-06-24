@@ -3,7 +3,7 @@ html, body
 {
     height: 100%;
     margin-bottom:0 !important;
-    
+    font-family: 'Playfair Display', serif;
 }
 
 div.mystyle

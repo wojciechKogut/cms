@@ -1,47 +1,60 @@
 <?php
 
-class Posts extends Controller 
-{
+class Posts extends Controller {
 
     private $posts;
     public $session;
     public $user;
     public $comments;
     public $categories;
-    
+    public $likes;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->posts         = $this->model('post');
         $this->session       = $this->model("session"); 
         $this->user          = $this->model('user');
         $this->comments      = $this->model('comment');
         $this->categories    = $this->model('category');
-        $this->comment_reply = $this->model('comment_reply');     
+        $this->comment_reply = $this->model('comment_reply');   
+        $this->likes         = $this->model('like');  
     }
     
 
-    public function index($id)
-    {   
-        if (!$this->session->session_check())
-         {
-             redirect(ROOT);
-         }
+    public function index($id) {   
+        if (!$this->session->session_check())  redirect(ROOT);
+         
+        if(!$this->user->isAdmin()) {
 
-        
+            if($_SERVER['REQUEST_METHOD'] == "POST") { 
+                if(isset($_POST['reset'])) {
+                    $user = $this->user->find_by_id($_SESSION['id']);
+                    $user_posts = $user->posts;
+                    $count_rows = $user_posts->count(); 
+                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
+                    $pagination = new Pagination(5, $id, $count_rows);
+                    $data = [$user_posts,$pagination, $this->session->message];
+                    $this->view('sub_posts', $data);
+                } else {
+                    $all_posts = $this->filtrTable(false,$_SESSION['id']);
+                    $count_rows = $all_posts->count();
+                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $data = [$pager->filtrData($_POST['searchTerm'],false,$_SESSION['id']),$pagination, $this->session->message];
+                    $this->view('sub_posts', $data);
+                }
 
-        if(!$this->user->isAdmin())
-        {
-            $user = $this->user->find_by_id($_SESSION['id']);
-            $user_posts = $user->posts;
-            $count_rows = $user_posts->count(); 
-            $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
-            $pagination = new Pagination(5, $id, $count_rows);
-            $data = [$user_posts,$pagination, $this->session->message];
-            $this->view('sub_posts', $data);
+            } else {
+                $user = $this->user->find_by_id($_SESSION['id']);
+                $user_posts = $user->posts;
+                $count_rows = $user_posts->count(); 
+                $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
+                $pagination = new Pagination(5, $id, $count_rows);
+                $data = [$user_posts,$pagination, $this->session->message];
+                $this->view('sub_posts', $data);
+            }
+            
         }
-        else
-        {
+        else {
             /** filtrowanie tabeli */
             if($_SERVER['REQUEST_METHOD'] == "POST") {
                 if(isset($_POST['reset'])) {
@@ -52,11 +65,11 @@ class Posts extends Controller
                     $data = [$pager->data_per_page(),$pagination, $this->session->message];
                     $this->view('adm_posts', $data);
                 } else {
-                    $all_posts = $this->filtrTable();
+                    $all_posts = $this->filtrTable(true);
                     $count_rows = $all_posts->count();
                     $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
                     $pagination = new Pagination(5, $id, $count_rows);  
-                    $data = [$pager->filtrData($_POST['searchTerm']),$pagination, $this->session->message];
+                    $data = [$pager->filtrData($_POST['searchTerm'],true),$pagination, $this->session->message];
                     $this->view('adm_posts', $data);
                 }     
             } else {
@@ -97,10 +110,10 @@ class Posts extends Controller
     }
 
 
-    public function filtrTable() {
+    public function filtrTable($isAdmin,$id=null) {
         if(isset($_POST['search'])) {
             $term = $_POST['searchTerm'];
-            return $this->posts->searchTable($term);
+            return $this->posts->searchTable($term,$isAdmin,$id);
         }
     }
     
@@ -214,16 +227,10 @@ class Posts extends Controller
                             break;
                     }
                 }
-
-                if ($id == 0) {
-                    redirect(ROOT . "posts/");
-                } else {
-                    redirect(ROOT . "posts/index/" . $id);
-                }
+                if ($id == 0)  redirect(ROOT . "posts/");
+                else  redirect(ROOT . "posts/index/" . $id);    
             } 
-            else {
-                redirect(ROOT . "posts/");
-            }
+            else redirect(ROOT . "posts/");    
         }
     }
     
@@ -241,15 +248,16 @@ class Posts extends Controller
 
         if (isset($_POST['submit'])) {
             
-            $this->posts->post_date = date('Y-m-d H:i:s');
+            
 
             $form = new Form("add_with_img", $_POST, $_FILES["post_image"], $rules, $this->posts);
 
             if ($form->proccess()) {
+                $this->posts->post_date = date('Y-m-d H:i:s');
                 $this->session->message("Post '" . $form->form_values["post_title"] . "' added"); 
                 $generator = new Vnsdks\SlugGenerator\SlugGenerator;
                 $postTitle = $generator->generate($form->form_values['post_title']);
-                $this->posts->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $this->posts->id]);
+                $this->posts->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $this->posts->id,'post_author'=>$_SESSION['user_name']]);
                 redirect(ROOT . "posts");
             }
         } else {
@@ -282,9 +290,9 @@ class Posts extends Controller
 
         if ($count_rows == 0) {
             $message = "No posts available";
-            $data = [$posts_per_page, $this->categories->get_data(), $count_rows, $id, $pagination, $recent_posts, $message];
+            $data = [$posts_per_page, $this->categories->get_data(), $count_rows, $slug, $pagination, $recent_posts, $message];
         } else {
-            $data = [$posts_per_page, $this->categories->get_data(), $count_rows, $id, $pagination, $recent_posts];
+            $data = [$posts_per_page, $this->categories->get_data(), $count_rows, $slug, $pagination, $recent_posts];
         }
 
         $this->view('posts_category', $data);
@@ -295,12 +303,15 @@ class Posts extends Controller
 
     public function destroy($id) {
         $post = $this->posts->find_by_id($id);
+        $post->likes()->delete();
         foreach($post->comments as $comment) {
             foreach($comment->replyComments as $reply) {
                 $reply->delete();
             }
             $comment->delete();
         }
+        $img = $post->post_image;
+        unlink( INCLUDES_PATH."images".DS."upload_img".DS.$img); 
         $post->delete();
         redirect(ROOT . "posts");
     }
@@ -315,19 +326,10 @@ class Posts extends Controller
         $keywords = "";
         $recent_posts = $this->posts::orderBy('id', 'desc')->where("post_status", "published")->limit(5)->get();
 
-        if (isset($_POST['search'])) {
-            $keywords = strip_tags($_POST['keywords']);
-
-            if (!empty($keywords)) {
-                $results = $this->posts->search_posts($keywords);
-                $count_results = $results->count();
-
-                if (empty($count_results)) {
-                    $msg = "No results for" . " '" . "<b>" . $keywords . "</b>" . "'";
-                }
-            } else {
-                $msg = "No results. Give some data";
-            }
+        if (isset($_POST['search'])) {  $keywords = strip_tags($_POST['keywords']);
+            if (!empty($keywords)) {  $results = $this->posts->search_posts($keywords); $count_results = $results->count();
+                if (empty($count_results)) $msg = "No results for" . " '" . "<b>" . $keywords . "</b>" . "'";     
+            } else $msg = "No results. Give some data"; 
         }
 
         $data = [

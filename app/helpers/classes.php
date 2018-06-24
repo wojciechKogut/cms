@@ -1,14 +1,12 @@
 <?php
 
-class Pagination
-{
+class Pagination {
 
     public $per_page;
     public $current_page;
     public $count;
 
-    public function __construct($per_page, $curent_page, $count)
-    {
+    public function __construct($per_page, $curent_page, $count) {
         $this->per_page = $per_page;
         $this->current_page = $curent_page == null ? 1 : $curent_page;
         $this->count = ceil($count / $per_page);
@@ -16,31 +14,25 @@ class Pagination
 
 
 
-    public function show_pagination()
-    {
+    public function show_pagination() {
         return ($this->count == 1) ? false : true;
     }
 
 
 
-    public function next()
-    {
+    public function next() {
         return $this->current_page + 1;
     }
 
 
 
-    public function previous()
-    {
+    public function previous() {
         return $this->current_page - 1;
     }
 
 
 
-    public function has_next()
-    {
-
-
+    public function has_next() {
         if ($this->current_page < $this->count) {
             return true;
         } else
@@ -49,8 +41,7 @@ class Pagination
 
 
 
-    public function has_previous()
-    {
+    public function has_previous() {
         if ($this->current_page <= 1) {
             return false;
         } else {
@@ -61,8 +52,7 @@ class Pagination
 
 }
 
-class Form
-{
+class Form {
 
     public $form_values;
     public $error = [];
@@ -74,9 +64,10 @@ class Form
     public $tmp_file;
     public $model;
     public $id;
+    public $user_img;
+    public $post_img;
 
-    public function __construct($form_role, $form_values, $files = [], $rules, $model, $id = "")
-    {
+    public function __construct($form_role, $form_values, $files = [], $rules, $model, $id = "") {
         $this->form_values = $form_values;
         $this->files = $files;
         $this->rules = $rules;
@@ -84,10 +75,11 @@ class Form
         $this->tmp_file = "";
         $this->model = $model;
         $this->id = $id;
+        $this->user_img = $model->user_image;
+        $this->post_img = $model->post_image;
     }
 
-    public function clean()
-    {
+    public function clean() {
         if (filter_has_var(INPUT_POST, "user_email")) {
             $email = filter_var($this->form_values["user_email"], FILTER_SANITIZE_EMAIL);
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -101,14 +93,17 @@ class Form
 //                        czy uzytkownik istnieje
             $user_name_exists = $this->model->where('user_name', $this->form_values['user_name'])->get();
 
-            if ($email_exists->count() > 0) {
-                $this->error["email_exists"] = "Email exists";
-                $this->style["email_exists"] = "required";
+            if($this->form_role === "save") {
+                if ($email_exists->count() > 0) {
+                    $this->error["email_exists"] = "Email exists";
+                    $this->style["email_exists"] = "required";
+                }
+                if ($user_name_exists->count() > 0) {
+                    $this->error["user_exists"] = "Username exists";
+                    $this->style["user_exists"] = "required";
+                }
             }
-            if ($user_name_exists->count() > 0) {
-                $this->error["user_exists"] = "Username exists";
-                $this->style["user_exists"] = "required";
-            }
+            
         }
 
 
@@ -134,66 +129,39 @@ class Form
         }
     }
 
-    public function form_rules()
-    {
+    public function form_rules() {
         foreach ($this->rules as $field => $rule) {
             $this->required_fields($field, $rule);
         }
     }
 
-    public function required_fields($field, $rule)
-    {
+    public function required_fields($field, $rule) {
         foreach ($rule as $key => $value) {
             if ($key == "required" && $value == true) {
                 if (empty($this->form_values[$field])) {
                     $this->error[$field] = "Field is required";
                     $this->style[$field] = "required";
                 }
-//                                else
-//                                {
-//                                        $this->error[$field] = "";
-//                                        $this->style[$field] = "";
-//                                }
             }
         }
     }
 
 
-    public function image($file)
-    {
+    public function image($file) {
         switch ($file["error"]) {
-            case UPLOAD_ERR_OK:
-                $this->set_up_file($file);
-                break;
-            case UPLOAD_ERR_INI_SIZE:
-                $this->upl_err = "The uploaded file exceeds the upload_max_filesize";
-                break;
-            case UPLOAD_ERR_FORM_SIZE:
-                $this->upl_err = "The uploaded file exceeds the MAX_FILE_SIZE directive";
-                break;
-            case UPLOAD_ERR_PARTIAL:
-                $this->upl_err = "The uploaded file was only partially uploaded.";
-                break;
-            case UPLOAD_ERR_NO_FILE:
-                $this->upl_err = "No file was uploaded";
-                break;
-            case UPLOAD_ERR_NO_TMP_DIR:
-                $this->upl_err = "Missing a temporary folder.";
-                break;
-            case UPLOAD_ERR_CANT_WRITE:
-                $this->upl_err = "Failed to write file to disk.";
-                break;
-            case UPLOAD_ERR_EXTENSION:
-                $this->upl_err = "A PHP extension stopped the file upload.";
-                break;
+            case UPLOAD_ERR_OK: $this->set_up_file($file); break;
+            case UPLOAD_ERR_INI_SIZE: $this->upl_err = "The uploaded file exceeds the upload_max_filesize";  break;
+            case UPLOAD_ERR_FORM_SIZE: $this->upl_err = "The uploaded file exceeds the MAX_FILE_SIZE directive";  break;
+            case UPLOAD_ERR_PARTIAL: $this->upl_err = "The uploaded file was only partially uploaded."; break;
+            case UPLOAD_ERR_NO_FILE: $this->upl_err = "No file was uploaded";  break;
+            case UPLOAD_ERR_NO_TMP_DIR: $this->upl_err = "Missing a temporary folder."; break;
+            case UPLOAD_ERR_CANT_WRITE: $this->upl_err = "Failed to write file to disk."; break;
+            case UPLOAD_ERR_EXTENSION: $this->upl_err = "A PHP extension stopped the file upload."; break;
         }
     }
 
 
-    public function set_up_file($file)
-    {
-
-
+    public function set_up_file($file) {
         if ($this->check_err()) {
             $dir = INCLUDES_PATH;
             move_uploaded_file($file["tmp_name"], $dir . "images" . DS . "upload_img" . DS . $file["name"]);
@@ -205,10 +173,7 @@ class Form
         }
     }
 
-    public static function delete_tmp_img()
-    {
-
-
+    public static function delete_tmp_img() {
         $dir = INCLUDES_PATH . "tmp";
         if (!$fd = opendir($dir)) {
             exit("Cannot open directory");
@@ -222,8 +187,7 @@ class Form
 
 
 
-    public function img_after_submit()
-    {
+    public function img_after_submit() {
         $dir = INCLUDES_PATH . "tmp";
         if (!$fd = opendir($dir)) {
             exit("Cannot open directory");
@@ -236,10 +200,7 @@ class Form
     }
 
 
-
-
-    public function check_err()
-    {
+    public function check_err() {
         foreach ($this->error as $field => $value) {
             if (!empty($value)) {
                 return false;
@@ -251,37 +212,28 @@ class Form
 
 
 
-    public function proccess()
-    {
+    public function proccess() {
 
         $this->clean();
         $this->form_rules();
 
-        if (!empty($this->files["name"])) {
-            $this->image($this->files);
-        }
+        if (!empty($this->files["name"]))  $this->image($this->files);
+        
 
         $this->img_after_submit();
 
         if ($this->check_err()) {
             switch ($this->form_role) {
 
-
                 case "add_with_img":
-
                     $classname = get_class($this->model);
                     $img = $classname . "_image";
 
-
                     foreach ($this->form_values as $property => $value) {
-                        if (in_array($property, $this->model->fillable)) {
-                            $this->model->$property = $value;
-                        }
+                        if (in_array($property, $this->model->fillable))  $this->model->$property = $value;
                     }
-
-
                     if (!empty($this->tmp_file)) {
-//                                                $final_img = preg_replace('/\d+/u', '', $this->tmp_file);
+//                      $final_img = preg_replace('/\d+/u', '', $this->tmp_file);
                         copy(INCLUDES_PATH . "tmp" . DS . $this->tmp_file, INCLUDES_PATH . DS . "images" . DS . "upload_img" . DS . $this->tmp_file);
                         $this->model->$img = $this->tmp_file;
                     } else if (!empty($this->files["name"])) {
@@ -289,57 +241,43 @@ class Form
                     } else {
                         $this->model->$img = "placeholder.jpg";
                     }
-
-
-
                     $this->model->save();
-
                     return true;
 
 
 
                 case "update_with_img":
-
                     foreach ($this->form_values as $property => $value) {
                         if (in_array($property, $this->model->fillable)) {
-                            $this->model->$property = $value;
-                        }
+                            if(!empty($value)) $this->model->$property = $value;  
+                        }                          
                     }
 
                     $classname = strtolower(get_class($this->model));
                     $img = $classname . "_image";
 
-                    if (!empty($this->files["name"])) {
-                        $this->model->$img = $this->files["name"];
-                    } else if (!empty($this->tmp_file)) {
-//                      $final_img = preg_replace('/\d+/u', '', $this->tmp_file);
+                    if (!empty($this->files["name"])) $this->model->$img = $this->files["name"];
+                    else if (!empty($this->tmp_file)) {
                         copy(INCLUDES_PATH . "tmp" . DS . $this->tmp_file, INCLUDES_PATH . DS . "images" . DS . "upload_img" . DS . $this->tmp_file);
                         $this->model->$img = $this->tmp_file;
                     } else {
-                        if (empty($this->model->$img)) {
-                            $this->model->$img = "placeholder.jpg";
-                        }
+                        if (empty($this->model->$img))  $this->model->$img = "placeholder.jpg";   
                     }
 
+                    if($this->model->user_image != $this->user_img) unlink(INCLUDES_PATH . "images" . DS . "upload_img" . DS . $this->user_img);
+                    if($this->model->post_image != $this->post_img) unlink(INCLUDES_PATH . "images" . DS . "upload_img" . DS . $this->post_img);
+                                
+                    $_SESSION['user_image'] = $this->model->user_image;
 
                     $this->model->save();
-
                     return true;
 
 
-
-
                 case "save":
-
-
                     foreach ($this->form_values as $property => $value) {
                         if (in_array($property, $this->model->fillable)) $this->model->$property = $value;
                     }
-
-                    if (!empty($this->files)) {
-                        $this->model->post_image = $this->files["name"];
-                    }
-
+                    if (!empty($this->files)) $this->model->post_image = $this->files["name"];
                     $this->model->save();
                     return true;
             }
@@ -355,8 +293,7 @@ class Form
 
 
 
-class Pager
-{
+class Pager {
 
     public $per_page;
     public $model;
@@ -365,8 +302,7 @@ class Pager
     public $user_id;
 
 
-    public function __construct($per_page, $model, $nr_page, $adm = null, $user_id = null)
-    {
+    public function __construct($per_page, $model, $nr_page, $adm = null, $user_id = null) {
         $this->per_page = $per_page;
         $this->model = $model;
         $this->nr_page = $nr_page;
@@ -377,21 +313,12 @@ class Pager
 
 
 
-    public function offset()
-    {
-        if ($this->nr_page == null) {
-            return ($this->per_page * 1) - $this->per_page;
-        } else {
-            return ($this->per_page * $this->nr_page) - $this->per_page;
-        }
+    public function offset() {
+        if ($this->nr_page == null) return ($this->per_page * 1) - $this->per_page;
+        else  return ($this->per_page * $this->nr_page) - $this->per_page;
     }
 
-
-
-
-
-    public function data_per_page()
-    {
+    public function data_per_page() {
         $offset = $this->offset();
 
         if (strtolower(get_class($this->model)) == "post" && $this->adm) {
@@ -406,9 +333,22 @@ class Pager
         return $this->model::orderBy('id', 'desc')->offset($offset)->limit(POSTS_PER_PAGE)->get();
     }
 
-    public function filtrData($term) {
+    public function filtrData($term, $isAdmin,$id = null) {
+        $classname = get_class($this->model);
         $offset = $this->offset();
-        return $this->model::where("post_title","like","%" . $term . "%")->offset($offset)->limit(POSTS_PER_PAGE)->get();
+        if($classname === "Post") {
+            if($isAdmin) { 
+                return $this->model::where("post_title","like","%" . $term . "%")->offset($offset)->limit(POSTS_PER_PAGE)->get();
+            } else {
+                $offset = $this->offset();
+                $userPosts = $this->model::where("post_title","like","%" . $term . "%");
+                return $userPosts->where("post_user_id",$id)->offset($offset)->limit(POSTS_PER_PAGE)->get();
+            }
+        } else if($classname == "User") {
+            return $this->model::where("user_name","like","%" . $term . "%")->offset($offset)->limit(POSTS_PER_PAGE)->get();
+        }
+        
+        
     }
 
     public function sortByQuery($sortBy) {
@@ -428,19 +368,12 @@ class Pager
 }
 
 
-
-
-
-function redirect($path)
-{
-
+function redirect($path){
     return header("location: " . $path);
 }
 
 
-
-function truncate($post_content)
-{
+function truncate($post_content) {
     return $post_content = (strlen($post_content) > 100) ? substr($post_content, 0, 200) . " (..)" : $post_content;
 }
 

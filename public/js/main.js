@@ -91,11 +91,8 @@ function timer() {
 setInterval(timer, 1000);
 
 
-
-
-
-function verify() {
-
+$('#login-form').on('submit', (e) => {
+    e.preventDefault();
     var form = document.getElementById("login-form");
     var username = form.username.value;
     var password = form.password.value;
@@ -152,8 +149,76 @@ function verify() {
                 }
             }
         });
-    }
-}
+        return true;
+    } else return false;
+});
+
+
+// function verify() {
+
+    // var form = document.getElementById("login-form");
+    // var username = form.username.value;
+    // var password = form.password.value;
+    // var info = document.getElementsByClassName('info');
+    // var user_regExp = /[a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{3,}/;
+    // var pass_regExp = /.{4,20}/;
+    // var errors = {
+    //     'username': '',
+    //     'password': ''
+    // };
+
+    // if (username == " " || username == null || !user_regExp.test(username)) {
+    //     info[0].style.color = "red";
+    //     errors['username'] = "Please fill username with at least 2 characters";
+    //     info[0].innerHTML = errors['username'];
+    // }
+    // else {
+    //     info[0].innerHTML = " ";
+    // }
+
+    // if (password == " " || password == null || !pass_regExp.test(password)) {
+    //     info[1].style.color = "red";
+    //     errors.password = "Empty password or to short";
+    //     info[1].innerHTML = errors.password;
+    // }
+    // else {
+    //     info[1].innerHTML = " ";
+    // }
+
+    // var i = 0;
+
+    // for (var key in errors) {
+    //     if (errors[key] != "") i++;
+    // }
+
+    // if (i === 0) {
+    //     let data = {
+    //         username: username,
+    //         password: password
+    //     };
+
+    //     $.ajax({
+    //         url: 'http://localhost/' + dir[1] + '/users/ajaxCheck/',
+    //         type: 'post',
+    //         data: data,
+    //         success: function (html) {
+    //             if (html.indexOf('admin') !== -1) {
+    //                 window.location = html;
+    //             } else {
+    //                 $('#loginErr').parent().css('display', 'block');
+    //                 $('#loginErr').text("Invalid username or password");
+    //                 $('#loginErr').addClass('alert alert-danger');
+    //                 form.reset();
+    //             }
+    //         }
+    //     });
+    //     return true;
+    // } else return false;
+    
+// }
+
+
+
 
 
 

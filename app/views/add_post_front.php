@@ -25,9 +25,6 @@ $recent      = $params[5];
         
         
         <div class="col-md-7 col-lg-6 ml-auto" style="background-color:#fff;">
-            <h1 class="my-4">Page Heading
-                <small>Secondary Text</small>
-            </h1>
 
             <hr>
             

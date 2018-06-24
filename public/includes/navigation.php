@@ -52,7 +52,7 @@
                    
                 <a href="#" class="dropdown-toggle nav-link" role="button" id="#login-form" data-toggle="dropdown">Login</a>
 
-                <form method="post" action="<?php echo ROOT ?>users/check_user" style="width:30rem "  id="login-form" role="form" autocomplete="off" class="form" aria-labelledby="login-form" >
+                <form method="post" action="<?php echo ROOT ?>users/check_user" style="width:30rem"  id="login-form" role="form" autocomplete="off" class="form" aria-labelledby="login-form" >
                     
                     <div class="dropdown-menu">
                         <div class="alert alert-danger ml-1 mr-1" style="display: none">
@@ -78,13 +78,12 @@
 
                         <div class="form-group dropdown-item" style="background-color:#fff;">
 
-                            <input name="login" class="btn btn-lg btn-primary btn-block" value="Login" type="button" onclick="verify()">
+                            <input name="login" class="btn btn-lg btn-primary btn-block" value="Login" type="submit">
                         </div>
                     </div>
               </form>
             </li>
                 <?php endif; ?>
-
             <li class="nav-item">
                 <a href="#" style="padding:15px 0; color:grey" class="nav-link ml-2" role="button" id="#login-form" data-toggle="dropdown"><?php echo isset($_SESSION['user_name']) ? "User online: " . $_SESSION['user_name'] : "" ?></a>
             </li>

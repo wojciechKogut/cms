@@ -1,14 +1,12 @@
-
-<?php include "admin/includes/header.php"; ?>
-<?php include "admin/includes/navigation.php"; ?>
-
-
 <?php 
 
     $users      = $params[0];
     $pagination = $params[1];
     $msg        = $params[2];
 ?>
+
+<?php include "admin/includes/header.php"; ?>
+<?php include "admin/includes/navigation.php"; ?>
 
 <div class="content-wrapper">
     <div class="container-fluid">
@@ -19,31 +17,23 @@
         </div>
         <hr>
       <!-- Breadcrumbs-->
-      <ol class="breadcrumb">
-          
-           <?php if(!empty($msg)) :?>
-            
-            <div style="color:#fff" class="bg bg-success form-control"> <?php echo $msg ?></div>
-            
+      <ol class="breadcrumb"> 
+           <?php if(!empty($msg)) :?> 
+            <div style="color:#fff" class="bg bg-success form-control"> <?php echo $msg ?></div>      
             <?php else: ?>
-            
-
         <li class="breadcrumb-item">
           <a href="#">Users</a>
         </li>
         <li class="breadcrumb-item active">User List</li>
-        
-        <?php endif; ?>
-        
+        <?php endif; ?> 
       </ol>
     </div> 
-    <div class="container mystyle">
+     <div class="col-lg-12 mystyle">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
             <hr>
-                
-            <form action="<?php echo ROOT . "users/select_option/" ?><?php echo $pagination->current_page . "/" ?>" method="post">
-               <div class="col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 2em;">
+            <form action="<?php echo ROOT . "users/select_option/" ?><?php echo $pagination->current_page; ?>" method="post">
+            <div class="row" style="margin-bottom: 2em;">
                 <div class="col-md-8 col-sm-12 col-xs-12">
                     <div class="form-group" style="float:left">
                         <select class="form-control" name="options" >
@@ -53,16 +43,25 @@
                             <option value="delete">Delete</option>
                         </select> 
                     </div>
-                    <div class="col-md-12 col-sm-12 col-xs-12 ml-4">
-                        <button class="btn btn-primary ml-4" type="submit" name="apply"  style="float:left;">Apply</button>
-                    </div>  
+                    <button class="btn btn-primary ml-4" type="submit" name="apply"  style="float:left;">Apply</button> 
                 </div>
+                <form action=""></form>
+                    <div class="col-md-2">
+                        <form action="" method="post">
+                        <div class="input-group mb-3">
+                            <input type="text" name="searchTerm" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                            <div class="input-group-prepend">                       
+                                <button class="btn btn-outline-secondary" type="submit" name="search"><i class="fa fa-search"></i></button>                       
+                            </div>
+                        </form>
+                    </div>
             </div>
-
-
-
+            <div class="col-md-2">
+                <form action="" method="post">                                               
+                    <button class="btn btn-outline-secondary form-control w-50" type="submit" name="reset">Reset</button>                       
+                </form>
+            </div>
                     <!--                   TABLE uesrs                                                   -->            
-
                     <div class="col-md-12">
                         <table class="table  table-responsive-lg table-responsive-md table-responsive-sm table-hover table-bordered mx-auto"  style="margin-bottom:5em;">
                             <thead>
@@ -113,35 +112,23 @@
                                     <?php if ($pagination->has_previous()): ?>
                                         <a class="page-link" href="<?php echo ROOT ?>users/index/<?php echo $pagination->previous() ?>">Previous</a></li>
                                     <?php endif; ?>
-
                                     <?php for ($i = 1; $i <= ceil($pagination->count); $i++): ?>
                                     <li class='page-item <?php echo $pagination->current_page == $i ? "active" : "" ?>'><a class='page-link' href='<?php echo ROOT ?>users/index/<?php echo $i ?>'><?php echo $i ?></a></li>
-
-
-
                                 <?php endfor; ?> 
                                 <li class="page-item">
                                 <?php if ($pagination->has_next()): ?>
                                         <a class="page-link" href="<?php echo ROOT ?>users/index/<?php echo $pagination->next() ?>">Next</a></li>
                                 <?php endif; ?>
-                            </ul>
-                            
+                            </ul>                          
                             <?php endif; ?>
-                            
                         </nav>
-
                     </div>
                 </form>  
         </div>
     </div>
-
     </div>    
-
-
     <!--MODAL-->
-
 </div>
-
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
@@ -163,13 +150,7 @@
 
     </div>
 </div>
-    
-    
-    
-    
     <?php require_once "admin/includes/footer.php"; ?>
-
-    
     <script>
         
             $(document).ready(function(){
@@ -186,7 +167,5 @@
                         }  
                });
             });
-            
-       
-            
+             
     </script>

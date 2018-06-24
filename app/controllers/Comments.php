@@ -18,7 +18,6 @@ class Comments extends Controller {
 
         $pager = new Pager(5, $this->comment, $id);
 
-
         if (!$this->users->isAdmin()) {
             $user_id = $_SESSION['id'];
             $comments_per_page = $pager->data_per_page()->where("comment_user_id", $user_id);
@@ -32,8 +31,6 @@ class Comments extends Controller {
             $pagination = new Pagination(5, $id, $count_rows);
             $data = [$comments_per_page, $pagination];
         }
-
-
         $this->view('comments', $data);
     }
     
@@ -57,7 +54,6 @@ class Comments extends Controller {
             $form = new Form("save", $_POST, array(), array(), $this->comment);
             $form->proccess();
 
-            //liczba komentarzy
             $post = $this->posts::findOrFail($_POST['comment_post_id']);
             $count = $post->comments()->count();
             $post->post_comment_count = $count;
@@ -80,7 +76,6 @@ class Comments extends Controller {
     
 
     public function select_option() {
-//        gdy jest submit i gdy zaznaczylismy jakies rekordy w tabeli
         if (isset($_POST['apply'])) {
             $options = $_POST['options'];
             $checkboxes = $_POST['checkboxes'];
@@ -100,19 +95,18 @@ class Comments extends Controller {
                             break;
                     }
                 }
-            } else {
-                redirect(ROOT . "comments");
-            }
+            } else redirect(ROOT . "comments");
         }
     }
     
     
 
     public function destroy($id) {
-        $comment = $this->comment::findOrFail($id);
+        $comment = $this->comment::find($id);
         foreach($comment->replyComments as $reply) {
             $reply->delete();
         }
+        $comment->delete();
         redirect(ROOT . "comments/");
     }
     

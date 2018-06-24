@@ -20,7 +20,7 @@
         </ol>
 
     </div> 
-    <div class="container mystyle">
+    <div class="col-lg-12 mystyle">
         <div class="row">
             <div class="col-md-12">
             
@@ -41,12 +41,7 @@
                     </div>  
                 </div>
             </div>
-
-
-       
-
         <!--                   TABLE COMMENTS                                                   -->            
-
         <div class="col-md-12" id="showCategories">
             <table class="table table-responsive-md table-responsive-sm table-responsive-xl table-responsive-lg table-hover table-bordered" id="categories" style="margin-bottom:5em;">
                 <thead>
@@ -169,16 +164,6 @@
     <?php require_once "admin/includes/footer.php"; ?>
 
     <script>
-//    
-////    $('.deleteModal').click(function(e){
-////            e.preventDefault();
-////            var id = $(this).attr('rel');
-////            console.log(id);
-////            $('#myModal').modal('show'); 
-////            $('.btnDelete').click(function(){
-////               window.location.href = '/refector/comments/delete_comments/'+id;
-////            });
-////    });  
             
      $('#checkAll').on('click',function(){
                         var isCheck = $('#checkAll').prop('checked');
