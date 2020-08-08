@@ -15,4 +15,4 @@ require_once 'libraries/Core.php';
 require_once 'libraries/Illuminate.php';
 require_once 'helpers/classes.php';
 
-$core = new Core();
+$core = new \App\Cms\libraries\Core();

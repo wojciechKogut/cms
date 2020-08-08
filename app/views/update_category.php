@@ -2,15 +2,10 @@
 <?php require_once "admin/includes/header.php"; ?>
 <?php require_once "admin/includes/navigation.php"; ?>
 
-
 <?php 
-
 $form = $params[0];
 $the_category = $params[1];
-
 ?>
-
-
 
 <div class="content-wrapper">
     <div class="container-fluid">

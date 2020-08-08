@@ -1,48 +1,70 @@
 <?php
+namespace App\Cms\controllers;
 
-class Comments extends Controller {
+use App\Cms\libraries\Controller as BaseController;
 
+class Comments extends BaseController {
+
+    /**
+     * @var \App\Cms\models\Comment
+     */
     public $comment;
 
-    public function __construct() {
+    /**
+     * @var \App\Cms\models\User
+     */
+    public $users;
+
+     /**
+     * @var \App\Cms\models\Post
+     */
+    public $posts;
+
+    /**
+     * @var \App\Cms\models\Session
+     */
+    public $session;
+
+    /**
+     * @var \App\Cms\models\Comment_reply
+     */
+    public $commnet_reply;
+
+    public function __construct()
+    {
         $this->comment = $this->model('comment');
         $this->users = $this->model('user');
         $this->posts = $this->model('post');
         $this->session = $this->model('session');
         $this->comment_reply = $this->model('comment_reply');
     }
-    
-    
 
-    public function index($id) {
+    public function index($id)
+    {
 
-        $pager = new Pager(5, $this->comment, $id);
+        $pager = new \App\Cms\helpers\Pager(5, $this->comment, $id);
 
         if (!$this->users->isAdmin()) {
             $user_id = $_SESSION['id'];
             $comments_per_page = $pager->data_per_page()->where("comment_user_id", $user_id);
             $count_rows = $this->comment->get_data()->where("comment_user_id", $user_id)->count();
-            $pagination = new Pagination(5, $id, $count_rows);
+            $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
             $data = [$comments_per_page, $pagination];
         } else {
             $comments_per_page = $pager->data_per_page();
             $all_comments = $this->comment->get_data();
             $count_rows = $all_comments->count();
-            $pagination = new Pagination(5, $id, $count_rows);
+            $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
             $data = [$comments_per_page, $pagination];
         }
         $this->view('comments', $data);
     }
-    
-    
 
-    public function ajax() {
-
+    public function ajax()
+    {
         if (isset($_POST)) {
-
             $this->comment->comment_date = \Illuminate\Support\Carbon::now()->diffForHumans();
             $this->comment->comment_status = 'approved';
-
             if ($this->session->session_check()) {
                 $this->comment->comment_user_id = $_SESSION['id'];
                 $this->comment->comment_email = $this->users->find_by_id($_SESSION['id'])->user_email;
@@ -51,7 +73,7 @@ class Comments extends Controller {
                 $this->comment->comment_user_id = 0;
             }
 
-            $form = new Form("save", $_POST, array(), array(), $this->comment);
+            $form = new \App\Cms\helpers\Form("save", $_POST, array(), array(), $this->comment);
             $form->proccess();
 
             $post = $this->posts::findOrFail($_POST['comment_post_id']);
@@ -59,23 +81,18 @@ class Comments extends Controller {
             $post->post_comment_count = $count;
             $post->save();
 
-
-//            odp ajax
             echo $this->comment->add();
         }
     }
     
-    
-
-    public function status($status, $id) {
+    public function status($status, $id)
+    {
         $this->comment::findOrFail($id)->update(['comment_status' => $status]);
         redirect(ROOT . "comments");
     }
-    
-    
-    
 
-    public function select_option() {
+    public function select_option()
+    {
         if (isset($_POST['apply'])) {
             $options = $_POST['options'];
             $checkboxes = $_POST['checkboxes'];
@@ -98,10 +115,9 @@ class Comments extends Controller {
             } else redirect(ROOT . "comments");
         }
     }
-    
-    
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $comment = $this->comment::find($id);
         foreach($comment->replyComments as $reply) {
             $reply->delete();
@@ -110,12 +126,8 @@ class Comments extends Controller {
         redirect(ROOT . "comments/");
     }
     
-    
-    
-    
-    
-
-    public function reply() {
+    public function reply()
+    {
         if (isset($_POST)) {
 
             $this->comment_reply->comment_reply_id = $_POST['comment_id'];
@@ -133,7 +145,4 @@ class Comments extends Controller {
             . " <img class='img-size img-circle pull-left'  src='$user_img' alt=''></li><span>".$this->comment_reply->created_at->diffForHumans() ."</span>";
         }
     }
-    
-    
-
 }

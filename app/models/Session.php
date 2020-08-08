@@ -1,4 +1,5 @@
 <?php
+namespace App\Cms\models;
 
 class Session
 {
@@ -13,39 +14,29 @@ class Session
     
     public function session_check()
     {
-        if (isset($_SESSION['user_name']))
-       {
+        if (isset($_SESSION['user_name'])){
             return true;
-        }
-        else
-        {
-            return false;
-        }   
+        } 
+
+        return false;
     }
     
     public function check_message()
     {
-        if(isset($_SESSION['message']))
-        {
+        if(isset($_SESSION['message'])) {
             $this->message = $_SESSION['message'];
             unset($_SESSION['message']);
-        }
-        else
-        {
+        }  else {
             $this->message = "";
         }
     }
     
-    public function message($msg="")
+    public function message($msg = "", $type = "success")
     {
-        if(!empty($msg))
-        {
-            return $_SESSION['message'] = $msg;
-        }
-        else
-        {
-            return $this->message;
-        }
+        if(!empty($msg)) {
+            return $_SESSION['message'] = ['text' => $msg, 'type' => $type];
+        } 
+
+        return $this->message;
     }
-    
 }

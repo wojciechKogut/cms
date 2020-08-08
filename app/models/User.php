@@ -1,17 +1,28 @@
 <?php
+namespace App\Cms\models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use App\Cms\interfaces\Model;
 
 class User extends Eloquent implements Model
 {
-
     protected $table = "users"; 
-    public $fillable = ['id','user_name','user_password','user_image','user_email','user_firstname','user_lastname','session_id','user_role']; 
+    public $fillable = [
+        'id',
+        'user_name',
+        'user_password',
+        'user_image',
+        'user_email',
+        'user_firstname',
+        'user_lastname',
+        'session_id',
+        'user_role'
+    ]; 
+
     public $timestamps = ['updated_at','created_at'];
     
-    
-
-    public function user_validate() {
+    public function user_validate() 
+    {
         if (isset($_POST)) {
             $username = strip_tags(trim($_POST['username']));
             $password = strip_tags(trim($_POST['password']));
@@ -31,16 +42,13 @@ class User extends Eloquent implements Model
         }
     }
 
-    
-
-    public function get_data() {
+    public function get_data() 
+    {
         return static::all();
     }
-    
-    
-    
 
-    public function isAdmin() {
+    public function isAdmin() 
+    {
         if (isset($_SESSION['id'])) {
             if ($this->find_by_id($_SESSION['id'])->user_role == "admin") {
                 return true;
@@ -49,30 +57,24 @@ class User extends Eloquent implements Model
 
         return false;
     }
-    
-    
 
-    public function subscribers() {
-
+    public function subscribers() 
+    {
         return static::all()->where('user_role', '=', 'subscriber');
     }
     
-    
-
-    public function posts() {
-        return $this->hasMany('Post', 'post_user_id');
+    public function posts() 
+    {
+        return $this->hasMany('\\App\\Cms\models\\Post', 'post_user_id');
     }
-    
-    
 
-    public function find_by_id($id) {
+    public function find_by_id($id) 
+    {
         return static::find($id);
     }
-    
-    
 
-    public function options($checkboxes, $options) {
-        die();
+    public function options($checkboxes, $options) 
+    {
         foreach ($checkboxes as $key => $userId) {
             $this->id = $userId;
             $options = $_POST['options'];
@@ -95,25 +97,21 @@ class User extends Eloquent implements Model
         }
     }
     
-    
-
-    public function user_profile($id) {
+    public function user_profile($id)
+    {
         return $this->find_by_id($id);
     }
     
-    
-
-    public function delete_record($id) {
+    public function delete_record($id) 
+    {
         $the_user = static::find($id);
         $img = $the_user->user_image; 
         if($img != "userplaceholder.png")  unlink(INCLUDES_PATH."images".DS."upload_img".DS. $img);
         $the_user->delete();
     }
 
-
-    
-    public function searchTable($term) {
+    public function searchTable($term) 
+    {
            return self::where("user_name","like","%" . $term . "%")->get();   
     }
-
 }

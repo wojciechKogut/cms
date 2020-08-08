@@ -1,11 +1,23 @@
 <?php
+namespace App\Cms\models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use App\Cms\interfaces\Model;
 
 class Comment extends Eloquent implements Model {
 
     protected $table = 'comments';
-    public $fillable = ['id', 'comment_post_id', 'comment_user_id', 'comment_author', 'comment_email', 'comment_content', 'comment_status', 'comment_date', 'reply_author'];
+    public $fillable = [
+        'id',
+        'comment_post_id',
+        'comment_user_id',
+        'comment_author',
+        'comment_email', 
+        'comment_content',
+        'comment_status', 
+        'comment_date', 
+        'reply_author'
+    ];
     public $timestamps = ['created_at', 'updated_at'];
 
     public function get_data() {
@@ -41,7 +53,7 @@ class Comment extends Eloquent implements Model {
 
     public function get_user_comm_img($user_id) {
 
-        $user = new User();
+        $user = new \App\Cms\models\User();
 
         //jezeli jest uzytkownik zalogwany
         if ($user_id != 0) {
@@ -53,7 +65,7 @@ class Comment extends Eloquent implements Model {
     }
 
     public function get_comm_author($user_id) {
-        return !empty($user_id) ? User::find($user_id)->user_name : $this->comment_author;
+        return !empty($user_id) ? \App\Cms\models\User::find($user_id)->user_name : $this->comment_author;
     }
     
     
@@ -61,8 +73,6 @@ class Comment extends Eloquent implements Model {
         return $this->hasMany('Comment_reply','comment_reply_id');
     }
     
-
-//    ajax - dodanie komentarza
     public function add() {
         $img = $this->get_user_comm_img($this->comment_user_id);
         $html = "<li id='' class='' style='list-style-type: none'>   

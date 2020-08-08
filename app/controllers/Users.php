@@ -1,6 +1,9 @@
 <?php
+namespace App\Cms\controllers;
 
-class Users extends Controller {
+use App\Cms\libraries\Controller as BaseController;
+
+class Users extends BaseController {
 
     public $session;
     public $count_comment = 0;

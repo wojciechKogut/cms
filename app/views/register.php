@@ -1,16 +1,12 @@
 <?php include "includes/header.php";?>
 <?php include "includes/navigation.php";?>
-
 <?php 
-
-if(isset($_SESSION['user_name'])) header("location: ".ROOT."/pages/admin/");
 
 $form = $params[0];
 if(!empty($form->error['user_exists'])) $user_exists = $form->error['user_exists']; 
 else $user_exists = "";
 if(!empty($form->error['email_exists']))  $email_exists = $form->error['email_exists'];
 else $email_exists = "";
-
 ?>
 
     

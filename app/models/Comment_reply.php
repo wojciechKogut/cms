@@ -1,6 +1,8 @@
 <?php
+namespace App\Cms\models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use App\Cms\interfaces\Model;
 
 class Comment_reply extends Eloquent {
 
@@ -12,9 +14,7 @@ class Comment_reply extends Eloquent {
         return static::all();
     }
     
-    
     public function user() {
         return $this->belongsTo('User','comment_user_id');
     }
-
 }

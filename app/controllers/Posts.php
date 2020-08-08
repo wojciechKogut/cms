@@ -1,12 +1,38 @@
 <?php
+namespace App\Cms\controllers;
 
-class Posts extends Controller {
+use App\Cms\libraries\Controller as BaseController;
 
+class Posts extends BaseController {
+
+    /**
+     * @var \App\Cms\models\Post
+     */
     private $posts;
+
+     /**
+     * @var \App\Cms\models\Session
+     */
     public $session;
+
+    /**
+     * @var \App\Cms\models\User
+     */
     public $user;
+
+    /**
+     * @var \App\Cms\models\Comment
+     */
     public $comments;
+
+     /**
+     * @var \App\Cms\models\Category
+     */
     public $categories;
+
+    /**
+     * @var \App\Cms\models\Like
+     */
     public $likes;
 
     public function __construct() {
@@ -19,79 +45,74 @@ class Posts extends Controller {
         $this->likes         = $this->model('like');  
     }
     
+    public function index($id) 
+    {   
+        if (!$this->session->session_check()){
+            redirect(ROOT);
+        }  
 
-    public function index($id) {   
-        if (!$this->session->session_check())  redirect(ROOT);
-         
-        if(!$this->user->isAdmin()) {
-
+        if (!$this->user->isAdmin()) {
             if($_SERVER['REQUEST_METHOD'] == "POST") { 
                 if(isset($_POST['reset'])) {
                     $user = $this->user->find_by_id($_SESSION['id']);
                     $user_posts = $user->posts;
                     $count_rows = $user_posts->count(); 
-                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
-                    $pagination = new Pagination(5, $id, $count_rows);
+                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
+                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
                     $data = [$user_posts,$pagination, $this->session->message];
                     $this->view('sub_posts', $data);
                 } else {
                     $all_posts = $this->filtrTable(false,$_SESSION['id']);
                     $count_rows = $all_posts->count();
-                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                     $data = [$pager->filtrData($_POST['searchTerm'],false,$_SESSION['id']),$pagination, $this->session->message];
                     $this->view('sub_posts', $data);
                 }
-
             } else {
                 $user = $this->user->find_by_id($_SESSION['id']);
                 $user_posts = $user->posts;
                 $count_rows = $user_posts->count(); 
-                $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
-                $pagination = new Pagination(5, $id, $count_rows);
+                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
+                $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
                 $data = [$user_posts,$pagination, $this->session->message];
                 $this->view('sub_posts', $data);
-            }
-            
-        }
-        else {
+            }    
+        } else {
             /** filtrowanie tabeli */
-            if($_SERVER['REQUEST_METHOD'] == "POST") {
+            if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 if(isset($_POST['reset'])) {
                     $all_posts = $this->posts->find_all_posts();
                     $count_rows = $all_posts->count();
-                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                     $data = [$pager->data_per_page(),$pagination, $this->session->message];
                     $this->view('adm_posts', $data);
                 } else {
                     $all_posts = $this->filtrTable(true);
                     $count_rows = $all_posts->count();
-                    $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new Pagination(5, $id, $count_rows);  
+                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                     $data = [$pager->filtrData($_POST['searchTerm'],true),$pagination, $this->session->message];
                     $this->view('adm_posts', $data);
                 }     
             } else {
                 $all_posts = $this->posts->find_all_posts();
                 $count_rows = $all_posts->count();
-                $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                $pagination = new Pagination(5, $id, $count_rows);  
+                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                 $data = [$pager->data_per_page(),$pagination, $this->session->message];
                 $this->view('adm_posts', $data);
             }
-            
         }
-        
-
     }
 
-
-    public function sortBy($id,$sortBy) {
+    public function sortBy($id,$sortBy) 
+    {
         $all_posts = $this->posts->find_all_posts();
         $count_rows = $all_posts->count();
-        $pager = new Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-        $pagination = new Pagination(5, $id, $count_rows);  
+        $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+        $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
         if($sortBy == "titleDesc") {
             $data = [$pager->sortByQuery("titleDesc"),$pagination, $this->session->message];
             $this->view('adm_posts', $data);
@@ -109,20 +130,19 @@ class Posts extends Controller {
         
     }
 
-
-    public function filtrTable($isAdmin,$id=null) {
+    public function filtrTable($isAdmin,$id=null) 
+    {
         if(isset($_POST['search'])) {
             $term = $_POST['searchTerm'];
             return $this->posts->searchTable($term,$isAdmin,$id);
         }
     }
     
-
-    public function update($id) {
+    public function update($id) 
+    {
         $form = "";
         $the_post = $this->posts->find_by_id($id);
         $author_post = $the_post->user;
-
         $rules = [
             "post_title" => array("required" => true),
             "post_category_id" => array("required" => true),
@@ -130,17 +150,17 @@ class Posts extends Controller {
         ];
 
         if (isset($_POST['update'])) {
-            $form = new Form("update_with_img", $_POST, $_FILES["post_image"], $rules, $the_post, $id);
+            $form = new \App\Cms\helpers\Form("update_with_img", $_POST, $_FILES["post_image"], $rules, $the_post, $id);
 
             if ($form->proccess()) {
-                $generator = new Vnsdks\SlugGenerator\SlugGenerator;
+                $generator = new \Vnsdks\SlugGenerator\SlugGenerator;
                 $postTitle = $generator->generate($form->form_values['post_title']);
                 $the_post->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $the_post->id]);
                 $this->session->message("Post '" . $form->form_values["post_title"] . "' updated");
                 redirect(ROOT . "posts");
             }
         } else {
-            Form::delete_tmp_img();
+            \App\Cms\helpers\Form::delete_tmp_img();
         }
 
         $data = [
@@ -152,15 +172,11 @@ class Posts extends Controller {
             $author_post
         ];
 
-
         $this->view('update_post', $data);
     }
     
-    
-    
-    
-
-    public function add_front() {
+    public function add_front() 
+    {
         $form = "";
         $recent_posts = $this->posts::orderBy('id', 'desc')->where("post_status", "published")->limit(5)->get();
         $rules = [
@@ -174,19 +190,17 @@ class Posts extends Controller {
         if (isset($_POST['submit'])) {
 
             $this->posts->post_status = "draft";
-            $form = new Form("add_with_img", $_POST, $_FILES["post_image"], $rules, $this->posts);
-
+            $form = new \App\Cms\helpers\Form("add_with_img", $_POST, $_FILES["post_image"], $rules, $this->posts);
             if ($form->proccess()) {
                 $this->session->message("Thanks for add post '" . $form->form_values["post_title"] . " '. This post waiting moderation ");
-                $generator = new Vnsdks\SlugGenerator\SlugGenerator;
+                $generator = new \Vnsdks\SlugGenerator\SlugGenerator;
                 $postTitle = $generator->generate($form->form_values['post_title']);
                 $this->posts->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $this->posts->id]);
                 redirect(ROOT . "posts/add_front");
             }
         } else {
-            Form::delete_tmp_img();
+            \App\Cms\helpers\Form::delete_tmp_img();
         }
-
 
         if (isset($_SESSION['id'])) $user_logged = $this->user->find_by_id($_SESSION['id']);
         else  $user_logged = "";
@@ -202,11 +216,9 @@ class Posts extends Controller {
 
         $this->view('add_post_front', $data);
     }
-    
-    
-    
 
-    public function select_option($id) {
+    public function select_option($id) 
+    {
         if (isset($_POST['apply'])) {
             $checkboxes = $_POST['checkboxes'];
             $options = $_POST['options'];
@@ -233,13 +245,10 @@ class Posts extends Controller {
             else redirect(ROOT . "posts/");    
         }
     }
-    
-    
-    
 
-    public function add() {
+    public function add() 
+    {
         $form = "";
-
         $rules = [
             "post_title" => array("required" => true),
             "post_category_id" => array("required" => true),
@@ -247,47 +256,35 @@ class Posts extends Controller {
         ];
 
         if (isset($_POST['submit'])) {
-            
-            
-
-            $form = new Form("add_with_img", $_POST, $_FILES["post_image"], $rules, $this->posts);
-
+            $form = new \App\Cms\helpers\Form("add_with_img", $_POST, $_FILES["post_image"], $rules, $this->posts);
             if ($form->proccess()) {
                 $this->posts->post_date = date('Y-m-d H:i:s');
                 $this->session->message("Post '" . $form->form_values["post_title"] . "' added"); 
-                $generator = new Vnsdks\SlugGenerator\SlugGenerator;
+                $generator = new \Vnsdks\SlugGenerator\SlugGenerator;
                 $postTitle = $generator->generate($form->form_values['post_title']);
                 $this->posts->update(['post_user_id'=>$_SESSION['id'],'slug'=>$postTitle . "-". $this->posts->id,'post_author'=>$_SESSION['user_name']]);
                 redirect(ROOT . "posts");
             }
         } else {
-            Form::delete_tmp_img();
+            \App\Cms\helpers\Form::delete_tmp_img();
         }
-
 
         $data = [$this->categories->get_data(), $this->user->get_data(), $form];
         $this->view('add_post', $data);
     }
     
-    
-    
-
-//    posty z przypisana kategoria, 'nr' to nr paginacji
     public function post_cat($slug, $nr = 1)
     {
         $cat = $this->categories::where('slug',$slug)->first();
         $id = $cat->id;
 
-        $pager = new Pager(POSTS_PER_PAGE, $this->posts, $nr);
+        $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE, $this->posts, $nr);
         $posts_per_page = $pager->data_per_page()->where('post_category_id', $id);
         $post_by_category = $this->posts->get_data()->where('post_category_id', $id);
         $count_rows = $post_by_category->count();
 
         $recent_posts = $this->posts::orderBy('id', 'desc')->where("post_status", "published")->limit(5)->get();
-
-        //id = aktualna strona
-        $pagination = new Pagination(5, $nr, $count_rows);
-
+        $pagination = new \App\Cms\helpers\Pagination(5, $nr, $count_rows);
         if ($count_rows == 0) {
             $message = "No posts available";
             $data = [$posts_per_page, $this->categories->get_data(), $count_rows, $slug, $pagination, $recent_posts, $message];
@@ -297,11 +294,9 @@ class Posts extends Controller {
 
         $this->view('posts_category', $data);
     }
-    
-    
-    
 
-    public function destroy($id) {
+    public function destroy($id) 
+    {
         $post = $this->posts->find_by_id($id);
         $post->likes()->delete();
         foreach($post->comments as $comment) {
@@ -316,10 +311,8 @@ class Posts extends Controller {
         redirect(ROOT . "posts");
     }
     
-    
-    
-
-    public function search() {
+    public function search() 
+    {
         $results = "";
         $msg = "";
         $count_results = [];
@@ -341,8 +334,6 @@ class Posts extends Controller {
             $recent_posts
         ];
 
-
         $this->view('search_post', $data);
     }
-
 }

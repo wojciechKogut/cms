@@ -1,5 +1,5 @@
-
 <?php
+namespace App\Cms\libraries;
 
 //glowna klasa aplikacji
 // odpowiedzialna za przechwytywanie url i ladowanie kontrolerow
@@ -19,7 +19,8 @@ class Core
         if (file_exists("../app/controllers/" . ucwords($url[0]) . ".php")) {
             require_once "../app/controllers/" . ucwords($url[0]) . ".php";
             $this->currentController = $url[0];
-            $this->currentController = new $this->currentController();
+            $class = "\\App\\Cms\\controllers\\$url[0]";
+            $this->currentController = new $class();
             unset($url[0]);
         } else {
             if (!empty($url[0])) {
@@ -28,7 +29,8 @@ class Core
             } else {
 //                tworzymy obiekt klasy Pages, jesli w url przyjdzie nieodpowiadajaca nazwa klasy
                 require_once "../app/controllers/" . $this->currentController . ".php";
-                $this->currentController = new $this->currentController();
+                $class = "\\App\\Cms\\controllers\\$this->currentController";
+                $this->currentController = new $class();
                 unset($url[0]);
             }
         }

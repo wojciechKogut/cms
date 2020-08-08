@@ -1,4 +1,6 @@
 <?php
+namespace App\Cms\models;
+
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class Like extends Eloquent {

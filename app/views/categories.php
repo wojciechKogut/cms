@@ -1,9 +1,8 @@
 
 <?php 
-        $categories = $params[0];
-        $pagination = $params[1];
-        $msg        = $params[2];
-        
+$categories = $params[0];
+$pagination = $params[1];
+$msg        = $params[2];
 ?>
 
 <?php require_once "admin/includes/header.php"; ?>
@@ -19,8 +18,9 @@
         <hr>
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">    
-        <?php if(!empty($msg)) :?>        
-            <div style="color:#fff" class="bg bg-success form-control"> <?php echo $msg ?></div>     
+        <?php if(!empty($msg)) :?>    
+            <?php $class = $msg['type'] === 'success' ? 'bg-success' : 'bg-warning'  ?>    
+            <div style="color:#fff" class="bg <?php echo $class ?> form-control"> <?php echo $msg['text'] ?></div>     
         <?php else: ?>
             <li class="breadcrumb-item">
               <a href="#">Categories</a>
