@@ -10,6 +10,8 @@ class Command
         $this->createUsersTable();
         $this->createPostTable();
         $this->createCommentsTable();
+        $this->createLikeTable();
+        $this->createCommentsReplyTable();
     }
 
     public function createPostTable()
@@ -109,6 +111,35 @@ class Command
         }
     }
 
+    public function createLikeTable()
+    {
+        if ($this->isTableExists('likes')) {
+            print("Table likes allready exists \n");
+            return;
+        }
+
+        $table = "likes";
+        try {
+            $db = $this->getConnection();
+            $db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
+            $sql = "CREATE table $table(
+                id INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
+                user_id INT ( 10 ) NOT NULL, 
+                post_id INT ( 10 ) NOT NULL,
+                count INT ( 10 ), 
+                updated_at DATETIME NOT NULL, 
+                created_at DATETIME NOT NULL, 
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (post_id) REFERENCES posts(id)
+                );";
+            $db->exec($sql);
+            print("Created $table Table.\n");
+
+        } catch(\PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
+
     public function createCommentsTable()
     {
         if ($this->isTableExists('comments')) {
@@ -127,9 +158,39 @@ class Command
                 comment_content VARCHAR( 150 ) NOT NULL, 
                 comment_status VARCHAR( 150 ) NOT NULL, 
                 comment_date DATETIME NOT NULL,
-                reply_author VARCHAR( 50 ) NOT NULL,
+                reply_author VARCHAR( 50 ),
                 comment_post_id INT ( 11 ) NOT NULL,
                 comment_user_id INT ( 11 ) NOT NULL,
+                updated_at DATETIME NOT NULL, 
+                created_at DATETIME NOT NULL, 
+                FOREIGN KEY (comment_post_id) REFERENCES posts(id),
+                FOREIGN KEY (comment_user_id) REFERENCES users(id)
+                );";
+            $db->exec($sql);
+            print("Created $table Table.\n");
+
+        } catch(\PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    public function createCommentsReplyTable()
+    {
+        if ($this->isTableExists('reply_comment')) {
+            print("Table comments reply allready exists \n");
+            return;
+        }
+
+        $table = "reply_comment";
+        try {
+            $db = $this->getConnection();
+            $db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
+            $sql = "CREATE table $table(
+                id INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
+                comment_post_id INT( 10 ) NOT NULL, 
+                comment_user_id INT( 10 ) NOT NULL,
+                comment_reply_id INT( 10 ) NOT NULL, 
+                comment_content VARCHAR( 150 ) NOT NULL, 
                 updated_at DATETIME NOT NULL, 
                 created_at DATETIME NOT NULL, 
                 FOREIGN KEY (comment_post_id) REFERENCES posts(id),
@@ -164,7 +225,7 @@ class Command
         $dbuser = "root";
         $dbpassword = "root";
 
-        return  new \PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USERNAME, DB_PASS);
+        return  new \PDO("mysql:host=".$dbhost.";dbname=".$dbname, $dbuser, $dbpassword);
     }
 }
 

@@ -1,15 +1,18 @@
 <?php
-            $post           = $params[0];
-            $id             = $params[1];
-            $the_comment    = $params[2];
-            $categories     = $params[3];
-            $category       = $params[4];
-            $user           = $params[5];
-            $reply_comment  = $params[6];
-            $recent         = $params[7];
-            $like           = $params[8];       
-            $numlikesToPost = $params[9];
-            $likesToPost    = $params[10];
+/**
+ * @var \App\Cms\models\Post
+ */
+$post           = $params[0];
+$id             = $params[1];
+$the_comment    = $params[2];
+$categories     = $params[3];
+$category       = $params[4];
+$user           = $params[5];
+$reply_comment  = $params[6];
+$recent         = $params[7];
+$like           = $params[8];       
+$numlikesToPost = $params[9];
+$likesToPost    = $params[10];
 
 ?>
 <?php include "includes/header.php"; ?>
@@ -30,7 +33,7 @@
                    <span class="ml-3">Category</span>  <b><a href="<?php echo ROOT."posts/post_cat/".$post['post_category_id'] ?>" style="color:<?php echo $post->category->color ?>"><?php echo !empty($post->category->cat_title) ? $post->category->cat_title : "Uncategorized" ; ?></a></b>
                </p>
                <hr>
-               <a href="#"><img class="mb-5 img-fluid mx-auto" style="width: 100%; height: 25em;" src="<?php echo ROOT."images/upload_img/" ; ?><?php echo $post->post_image ;   ?>" alt="Card image cap"> </a> 
+               <a href="#"><img class="mb-5 img-fluid mx-auto" style="width: 100%; height: 25em;" src="<?php echo ROOT."public/images/upload_img/" ; ?><?php echo $post->post_image ;   ?>" alt="Card image cap"> </a> 
                <div class="col-md-10">
                   <input type="hidden" id="likesToPost" value="<?php echo $numlikesToPost ?>">
                   <a href="javascript:void(0)"  style="cursor:<?php echo !isset($_SESSION['id']) ? "default" : "pointer" ?>; float:left" onclick="like();"><i  class="fa fa-thumbs-o-up mr-3 <?php echo ($like->user_id != 0 && $like->user_id == $_SESSION['id']) ? "like" : "" ?>"></i></a>

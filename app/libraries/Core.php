@@ -1,75 +1,83 @@
 <?php
-namespace App\Cms\libraries;
+declare(strict_types=1);
 
-//glowna klasa aplikacji
-// odpowiedzialna za przechwytywanie url i ladowanie kontrolerow
-//format w jakim url bedzie tworzony : /controller/method/params
+namespace App\Cms\libraries;
 
 class Core
 {
-
     private $currentController = "Pages";
     private $currentMethod = "index";
     private $params = [];
-    private $url;
+    private $container;
 
-    public function __construct()
+    public function __construct(\App\Cms\libraries\Container $container)
     {
-        $url = $this->getUrl();
-        if (file_exists("../app/controllers/" . ucwords($url[0]) . ".php")) {
-            require_once "../app/controllers/" . ucwords($url[0]) . ".php";
-            $this->currentController = $url[0];
-            $class = "\\App\\Cms\\controllers\\$url[0]";
-            $this->currentController = new $class();
-            unset($url[0]);
-        } else {
-            if (!empty($url[0])) {
-                require_once 'errorpage.php';
-                die();
-            } else {
-//                tworzymy obiekt klasy Pages, jesli w url przyjdzie nieodpowiadajaca nazwa klasy
-                require_once "../app/controllers/" . $this->currentController . ".php";
-                $class = "\\App\\Cms\\controllers\\$this->currentController";
-                $this->currentController = new $class();
-                unset($url[0]);
-            }
+        $this->container = $container;
+
+        $url = $this->getUrl();   
+        if ($url === null) {
+            $this->loadDefaultControler();
+            return;
         }
 
-
-
-        if (isset($url[1])) {
-            if (method_exists($this->currentController, $url[1])) {
-                $this->currentMethod = $url[1];
-                unset($url[1]);
-                $this->params = $url ? array_values($url) : [];
-                call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
-                return 0;
-            } else {
-                if (!empty($url[1])) {
-                    require_once 'errorpage.php';
-                    unset($url[1]);
-                    die();
-                }
-            }
+        $controller = ucwords($url[0]);
+        if (!file_exists("../app/controllers/" . $controller . ".php")) {
+            $this->loadErrorPage();
+            return;
         }
 
+        $class = "\\App\\Cms\\controllers\\$controller";
+        $this->currentController = $this->container->get($class);
+        unset($url[0]);
+        if (empty($url[1]) || $url[1] === '' || $url[1] === null) {
+            $this->loadDefaultAction($url);
+            return;
+        }
+
+        if (!method_exists($this->currentController, $url[1])) {
+            $this->loadErrorPage();
+            unset($url[1]);
+            return;
+        }
+
+        $this->currentMethod = $url[1];
+        unset($url[1]);
         $this->params = $url ? array_values($url) : [];
 
         call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
     }
 
-    public function getUrl()
+    public function getUrl(): ?array
     {
-        if (isset($_GET['url'])) {
-            $url = $_GET['url'];
-            $url_length = strlen($_GET['url']);
-            if ($url[$url_length - 1] != "/") {
-                $url = $url . "/";
-            }
-            $url = trim($url);
-            $url = explode('/', $url);
-            return $url;
+        $url = $_GET['url'];
+        if (!isset($url)) {
+            return null;
         }
+
+        $urlLength = strlen($url);
+        if ($url[$urlLength - 1] != "/") {
+            $url = $url . "/";
+        }
+
+        $url = explode('/', trim($url));
+
+        return $url;   
     }
 
+    private function loadDefaultControler(): void
+    {
+        $class = "\\App\\Cms\\controllers\\" . $this->currentController;
+        call_user_func_array([$this->container->get($class), $this->currentMethod], $this->params);
+    }
+
+    private function loadErrorPage(): void
+    {
+        require_once 'errorpage.php';
+    }
+
+    private function loadDefaultAction(array $url): void
+    {
+        $this->params = $url ? array_values($url) : [];
+        call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
+    }
 }

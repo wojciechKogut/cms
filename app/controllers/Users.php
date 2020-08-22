@@ -7,6 +7,10 @@ class Users extends BaseController {
 
     public $session;
     public $count_comment = 0;
+
+    /**
+     * @var \App\Cms\models\User
+     */
     public $user;
     public $posts;
     public $comments;
@@ -15,7 +19,7 @@ class Users extends BaseController {
     public $reply_comment;
 
     public function __construct() {    
-        $this->session = $this->model('session');
+        $this->session = new \App\Cms\helpers\Session();
         $this->session->session_start;
         $this->user = $this->model('user');
         $this->posts = $this->model('post');
@@ -125,7 +129,7 @@ class Users extends BaseController {
                 "user_email"    => array("required" => true),
                 "user_password" => array("required" => true),
             ];
-            $form = new Form("save", $_POST, array(), $rules, $this->user);
+            $form = new \App\Cms\helpers\Form("save", $_POST, array(), $rules, $this->user);
             if ($form->proccess()) {
                 $_SESSION['user_name'] = $this->user->user_name;
                 $_SESSION['id'] = $this->user->id;
@@ -155,27 +159,27 @@ class Users extends BaseController {
         
         if($_SERVER['REQUEST_METHOD'] == "POST") {
             if(isset($_POST['reset'])) {
-                $pager = new Pager(5, $this->user, $id);
+                $pager = new \App\Cms\helpers\Pager(5, $this->user, $id);
                 $users_per_page = $pager->data_per_page();
                 $all_users = $this->user->get_data();
                 $count_rows = $all_users->count();
-                $pagination = new Pagination(5, $id, $count_rows);
+                $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
                 $data = [$users_per_page, $pagination, $this->session->message];
                 $this->view('users', $data);
             } else {
                 $all_users = $this->filtrTable();
                 $count_rows = $all_users->count();
-                $pager = new Pager(POSTS_PER_PAGE,$this->user,$id);
-                $pagination = new Pagination(5, $id, $count_rows);  
+                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->user,$id);
+                $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                 $data = [$pager->filtrData($_POST['searchTerm'],true),$pagination, $this->session->message];
                 $this->view('users', $data);
             }
         } else {
-            $pager = new Pager(5, $this->user, $id);
+            $pager = new \App\Cms\helpers\Pager(5, $this->user, $id);
             $users_per_page = $pager->data_per_page();
             $count_rows = $this->user->get_data()->count();
             // $count_rows = $all_users->count();
-            $pagination = new Pagination(5, $id, $count_rows);
+            $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
 
             /* if user isnt admin redirect do dashboard */ 
             if ($this->user->find_by_id($_SESSION['id'])->user_role != "subscriber") {
@@ -211,7 +215,7 @@ class Users extends BaseController {
                 "user_email"     => array("required" => true),
                 "user_password"  => array("required" => true)
             ];
-            $form = new Form("save", $_POST, array(), $rules, $the_user, $id);
+            $form = new \App\Cms\helpers\Form("save", $_POST, array(), $rules, $the_user, $id);
             if ($form->proccess()) {
                 $this->session->message("User '" . $form->form_values["user_name"] . "' updated");
                 redirect(ROOT . "users");
@@ -289,13 +293,13 @@ class Users extends BaseController {
                 "user_email"     => array("required" => true),
                 // "user_password"  => array("required" => true)
             ];
-            $form = new Form("update_with_img", $_POST, $_FILES['user_image'], $rules, $edit_user);
+            $form = new \App\Cms\helpers\Form("update_with_img", $_POST, $_FILES['user_image'], $rules, $edit_user);
             if ($form->proccess()) {
                 $_SESSION["user_name"] = $form->form_values["user_name"];
                 $this->session->message("User updated");
                 redirect(ROOT . "users");
             }
-        } else  Form::delete_tmp_img();
+        } else  \App\Cms\helpers\Form::delete_tmp_img();
         $data = [$edit_user, $form];
         $this->view('profile', $data);
     }
@@ -322,20 +326,11 @@ class Users extends BaseController {
                         echo json_encode($data);
                     }  
                     
-                } catch(Exception $e) {
+                } catch(\Exception $e) {
                     echo "Caught exceptionn: " . $e->getMessage();
                 }
                 
             }
         }
     }
-
-
-
-
-
-
-
-
-
 }

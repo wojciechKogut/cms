@@ -56,7 +56,6 @@ class Form {
 
 
         foreach ($this->form_values as $field => $value) {
-            
             if($field != "post_content") {
                 $this->form_values[$field] = strip_tags($value);
                 $this->form_values[$field] = filter_var($value, FILTER_SANITIZE_STRING);
@@ -65,9 +64,6 @@ class Form {
                 $this->form_values[$field] = filter_var($value, FILTER_SANITIZE_STRING);
                 $this->form_values[$field] = htmlspecialchars($value);
             }
-            
-
-
 
             if ($field == "user_password") {
                 if (!empty($value)) {

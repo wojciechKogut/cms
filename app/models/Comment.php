@@ -20,6 +20,86 @@ class Comment extends Eloquent implements Model {
     ];
     public $timestamps = ['created_at', 'updated_at'];
 
+    public function getCommentPostId()
+    {
+        return $this->comment_post_id;
+    }
+
+    public function getCommentUserId()
+    {
+        return $this->comment_user_id;
+    }
+
+    public function getCommentAuthor()
+    {
+        return $this->comment_author;
+    }
+
+    public function getCommentEmail()
+    {
+        return $this->comment_email;
+    }
+
+    public function getCommentContent()
+    {
+        return $this->comment_content;
+    }
+
+    public function getCommentStatus()
+    {
+        return $this->comment_status;
+    }
+
+    public function getCommentDate()
+    {
+        return $this->comment_date;
+    }
+
+    public function getReplyAuthor()
+    {
+        return $this->reply_author;
+    }
+
+    public function setCommentPostId(int $id)
+    {
+        $this->comment_post_id = $id;
+    }
+
+    public function setCommentUserId(int $id)
+    {
+        $this->comment_user_id = $id;
+    }
+
+    public function setCommentAuthor(string $author)
+    {
+        $this->comment_author = $author;
+    }
+
+    public function setCommentEmail(string $email)
+    {
+        $this->comment_email = $email;
+    }
+
+    public function setCommentContent(string $content)
+    {
+        $this->comment_content = $content;
+    }
+
+    public function setCommentStatus(string $status)
+    {
+        $this->comment_status = $status;
+    }
+
+    public function setCommentDate(string $date)
+    {
+        $this->comment_date = $date;
+    }
+
+    public function setReplyAuthor(string $replyAuthor)
+    {
+        $this->reply_author = $replyAuthor;
+    }
+
     public function get_data() {
         return static::orderBy('id', 'desc')->get();
     }

@@ -2,87 +2,96 @@
 namespace App\Cms\controllers;
 
 use App\Cms\libraries\Controller as BaseController;
+use App\Cms\helpers\Form;
+use App\Cms\helpers\Pagination;
+use App\Cms\helpers\Pager;
+use App\Cms\models\Comment;
+use App\Cms\models\User;
+use App\Cms\models\Post;
+use App\Cms\helpers\Session;
+use App\Cms\models\Comment_reply;
 
 class Comments extends BaseController {
 
     /**
-     * @var \App\Cms\models\Comment
+     * @var Comment $comment
      */
     public $comment;
 
     /**
-     * @var \App\Cms\models\User
+     * @var User $user
      */
-    public $users;
+    public $user;
 
      /**
-     * @var \App\Cms\models\Post
+     * @var Post $post
      */
-    public $posts;
+    public $post;
 
     /**
-     * @var \App\Cms\models\Session
+     * @var Session $session
      */
     public $session;
 
     /**
-     * @var \App\Cms\models\Comment_reply
+     * @var Comment_reply $commentReply
      */
-    public $commnet_reply;
+    public $commnetReply;
 
-    public function __construct()
-    {
-        $this->comment = $this->model('comment');
-        $this->users = $this->model('user');
-        $this->posts = $this->model('post');
-        $this->session = $this->model('session');
-        $this->comment_reply = $this->model('comment_reply');
+    public function __construct(
+        Comment $comment,
+        User $user,
+        Post $post,
+        Session $session,
+        Comment_reply $commentReply
+    ) {
+        $this->comment = $comment;
+        $this->user = $user;
+        $this->post = $post;
+        $this->session = $session;
+        $this->commentReply = $commentReply;
     }
 
     public function index($id)
     {
-
-        $pager = new \App\Cms\helpers\Pager(5, $this->comment, $id);
-
-        if (!$this->users->isAdmin()) {
-            $user_id = $_SESSION['id'];
-            $comments_per_page = $pager->data_per_page()->where("comment_user_id", $user_id);
-            $count_rows = $this->comment->get_data()->where("comment_user_id", $user_id)->count();
-            $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
-            $data = [$comments_per_page, $pagination];
+        $pager = new Pager(5, $this->comment, $id);
+        if (!$this->user->isAdmin()) {
+            $userId = $_SESSION['id'];
+            $commentsPerPage = $pager->data_per_page()->where("comment_user_id", $userId);
+            $countRows = $this->comment->get_data()->where("comment_user_id", $userId)->count();
         } else {
-            $comments_per_page = $pager->data_per_page();
-            $all_comments = $this->comment->get_data();
-            $count_rows = $all_comments->count();
-            $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
-            $data = [$comments_per_page, $pagination];
+            $commentsPerPage = $pager->data_per_page();
+            $countRows = $this->comment->get_data()->count();
         }
+
+        $pagination = new Pagination(5, $id, $countRows);
+        $data = [$commentsPerPage, $pagination];
+
         $this->view('comments', $data);
     }
 
     public function ajax()
     {
-        if (isset($_POST)) {
-            $this->comment->comment_date = \Illuminate\Support\Carbon::now()->diffForHumans();
-            $this->comment->comment_status = 'approved';
-            if ($this->session->session_check()) {
-                $this->comment->comment_user_id = $_SESSION['id'];
-                $this->comment->comment_email = $this->users->find_by_id($_SESSION['id'])->user_email;
-                $this->comment->comment_author = $this->users->find_by_id($_SESSION['id'])->user_name;
-            } else {
-                $this->comment->comment_user_id = 0;
-            }
-
-            $form = new \App\Cms\helpers\Form("save", $_POST, array(), array(), $this->comment);
-            $form->proccess();
-
-            $post = $this->posts::findOrFail($_POST['comment_post_id']);
-            $count = $post->comments()->count();
-            $post->post_comment_count = $count;
-            $post->save();
-
-            echo $this->comment->add();
+        $commentAjaxValidator = new \App\Cms\Validators\CommentAjaxValidator($_POST);
+        $this->comment->setCommentDate($commentAjaxValidator->getCommentDate());
+        $this->comment->setCommentStatus($commentAjaxValidator->getCommentStatus());
+        if ($this->session->session_check()) {
+            $userId = $_SESSION['id'];
+            $this->comment->setCommentUserId($commentAjaxValidator->getCommentUserId());
+            $this->comment->setCommentEmail($this->user->find_by_id($userId)->user_email);
+            $this->comment->setCommentAuthor($this->user->find_by_id($userId)->user_name);
         }
+
+        $form = new Form("save", $_POST, array(), array(), $this->comment);
+        $form->proccess();
+
+        $post = $this->post::findOrFail($commentAjaxValidator->getCommentPostId());
+        $count = $post->comments()->count();
+        $post->post_comment_count = $count;
+        $post->save();
+
+        echo json_encode($this->comment->add());
+        
     }
     
     public function status($status, $id)
@@ -93,26 +102,29 @@ class Comments extends BaseController {
 
     public function select_option()
     {
-        if (isset($_POST['apply'])) {
-            $options = $_POST['options'];
-            $checkboxes = $_POST['checkboxes'];
+        if (!isset($_POST['apply'])) {
+           return null;
+        }
 
-            if (isset($options) && !empty($options) && !empty($checkboxes)) {
-                foreach ($checkboxes as $key => $commentId) {
-                    $options = $_POST['options'];
-                    switch ($options) {
-                        case "approved":
-                            $this->status("approved", $commentId);
-                            break;
-                        case "unapproved":
-                            $this->status("unapproved", $commentId);
-                            break;
-                        case "delete":
-                            $this->destroy($commentId);
-                            break;
-                    }
+        $options = $_POST['options'];
+        $checkboxes = $_POST['checkboxes'];
+        if (isset($options) && !empty($options) && !empty($checkboxes)) {
+            foreach ($checkboxes as $key => $commentId) {
+                $options = $_POST['options'];
+                switch ($options) {
+                    case "approved":
+                        $this->status("approved", $commentId);
+                        break;
+                    case "unapproved":
+                        $this->status("unapproved", $commentId);
+                        break;
+                    case "delete":
+                        $this->destroy($commentId);
+                        break;
                 }
-            } else redirect(ROOT . "comments");
+            }
+        } else {
+            redirect(ROOT . "comments");
         }
     }
 
@@ -129,20 +141,17 @@ class Comments extends BaseController {
     public function reply()
     {
         if (isset($_POST)) {
-
-            $this->comment_reply->comment_reply_id = $_POST['comment_id'];
-            $this->comment_reply->comment_post_id = $_POST['post_id'];
-            $this->comment_reply->comment_user_id = $_POST['user_id'];
-            $this->comment_reply->comment_content = $_POST['content'];
-
+            $this->commentReply->comment_reply_id = $_POST['comment_id'];
+            $this->commentReply->comment_post_id = $_POST['post_id'];
+            $this->commentReply->comment_user_id = $_POST['user_id'];
+            $this->commentReply->comment_content = $_POST['content'];
             $user_img = $this->comment->get_user_comm_img($_POST['user_id']);
+            $this->commentReply->save();
 
-            $this->comment_reply->save();
-
-            echo $html = "<li class='mt-4' style='word-wrap:break-word; min-height:3rem; list-style-type:none; background-color: #fff;border-radius: 25px'>"
-            ."<strong> ".$this->comment_reply->user->user_name ." </strong>"
+            echo "<li class='mt-4' style='word-wrap:break-word; min-height:3rem; list-style-type:none; background-color: #fff;border-radius: 25px'>"
+            ."<strong> ".$this->commentReply->user->user_name ." </strong>"
             . $_POST['content']
-            . " <img class='img-size img-circle pull-left'  src='$user_img' alt=''></li><span>".$this->comment_reply->created_at->diffForHumans() ."</span>";
+            . " <img class='img-size img-circle pull-left'  src='$user_img' alt=''></li><span>".$this->commentReply->created_at->diffForHumans() ."</span>";
         }
     }
 }

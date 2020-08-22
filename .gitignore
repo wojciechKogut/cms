@@ -8,3 +8,4 @@ vendor/
 app/config/config.php
 public/includes/images
 public/images/
+var/

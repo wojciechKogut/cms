@@ -35,7 +35,7 @@ class Post extends Eloquent implements Model {
     }
     
     public function category() {
-        return $this->belongsTo('Category', 'post_category_id');
+        return $this->belongsTo('\\App\\Cms\\models\\Category', 'post_category_id');
     }
     
     public function likes() {
@@ -44,11 +44,11 @@ class Post extends Eloquent implements Model {
     
 
     public function user() {
-        return $this->belongsTo('User', 'post_user_id');
+        return $this->belongsTo('\\App\\Cms\\models\\User', 'post_user_id');
     }
     
     public function comments() {
-        return $this->hasMany('Comment', 'comment_post_id');
+        return $this->hasMany('\\App\\Cms\\models\\Comment', 'comment_post_id');
     }
     
     public function find_all_posts() {
@@ -72,7 +72,7 @@ class Post extends Eloquent implements Model {
     public function get_user_img($user_id) {
         $the_user = new User();
         $user_image = $the_user->find_by_id($user_id)->user_image;
-        return !empty($user_image) ? ROOT . "images/upload_img/" . $user_image : ROOT . "images/userplaceholder.png";
+        return !empty($user_image) ? ROOT . "public/images/upload_img/" . $user_image : ROOT . "public/images/userplaceholder.png";
     }
     
     public function search_posts($keywords) {
@@ -85,7 +85,7 @@ class Post extends Eloquent implements Model {
         }
     }
 
-    public function searchTable($term,$isAdmin,$id = null) {
+    public function searchTable($term, $isAdmin, $id = null) {
         if($isAdmin) {
             return self::where("post_title","like","%" . $term . "%")->get();
         } else {

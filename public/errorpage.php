@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
+	<title>404 HTML Template by Colorlib</title>
 
+	<!-- Google font -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:200,400,700" rel="stylesheet">
 
-        <link href="<?php echo ROOT ?>css/404.css" rel="stylesheet">
+    <link href="<?php echo ROOT ?>public/css/404.css" rel="stylesheet">
 
-    </head>
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
 
-    <body>
-        <div class="wrapper row2">
-            <div id="container" class="clear">
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-                <section id="fof" class="clear">
-                    <!-- ####################################################################################################### -->
-                    <div class="hgroup clear">
-                        <h1>404</h1>
-                        <h2>Error ! <span>Page Not Found</span></h2>
-                    </div>
-                    <p>For Some Reason The Page You Requested Could Not Be Found On Our Server</p>
-                    <p><a href="javascript:history.go(-1)">&laquo; Go Back</a> / <a href="<?php echo ROOT ?>">Go Home &raquo;</a></p>
-                    <!-- ####################################################################################################### -->
-                </section>
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-                <!-- ####################################################################################################### -->
-            </div>
-        </div>
-    </body>
+</head>
+
+<body>
+
+	<div id="notfound">
+		<div class="notfound">
+			<div class="notfound-404">
+				<h1>Oops!</h1>
+				<h2>404 - The Page can't be found</h2>
+			</div>
+			<a href="#">Go TO Homepage</a>
+		</div>
+	</div>
+
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+
 </html>

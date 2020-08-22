@@ -30,7 +30,7 @@ $form = $params[0];
     <div class="container mystyle">
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <form role="form" action="<?php echo ROOT ?>categories/add" id="addCategory" method="post" >
+            <form role="form" action="<?php echo ROOT ?>categories/addCategory" id="addCategory" method="post" >
 
                 <?php if(!empty($form->form_values)): ?>
                 

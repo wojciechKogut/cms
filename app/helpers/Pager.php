@@ -13,7 +13,6 @@ class Pager
         $this->per_page = $per_page;
         $this->model = $model;
         $this->nr_page = $nr_page;
-        // $this->link = $link;
         $this->adm = $adm;
         $this->user_id = $user_id;
     }

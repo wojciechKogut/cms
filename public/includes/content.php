@@ -26,7 +26,7 @@ $recent = $params[5];
                         <div class="col-md-12 col-lg-12 col-xl-8 slider">
                             <ul class="rslides card-img-top mx-auto" style="position:relative;">
                                 <?php foreach ($posts as $post) : ?>
-                                    <li><a href="<?php echo ROOT . "users/post/" . $post->slug ?>"><img class="img-fluid" src="<?php echo ROOT . "images/upload_img/" . $post->post_image ?>" alt="" srcset=""></a><div class="card-body">
+                                    <li><a href="<?php echo ROOT . "users/post/" . $post->slug ?>"><img class="img-fluid" src="<?php echo ROOT . "public/images/upload_img/" . $post->post_image ?>" alt="" srcset=""></a><div class="card-body">
                                 <div id="sliderCaption"><p><?php echo $post->post_title . ": " . strip_tags(html_entity_decode(truncate($post->post_content))); ?></p></div>
                             </div>  </li>
                                 <?php endforeach; ?>

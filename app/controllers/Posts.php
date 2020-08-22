@@ -8,10 +8,10 @@ class Posts extends BaseController {
     /**
      * @var \App\Cms\models\Post
      */
-    private $posts;
+    private $post;
 
      /**
-     * @var \App\Cms\models\Session
+     * @var \App\Cms\helpers\Session
      */
     public $session;
 
@@ -35,14 +35,26 @@ class Posts extends BaseController {
      */
     public $likes;
 
-    public function __construct() {
-        $this->posts         = $this->model('post');
-        $this->session       = $this->model("session"); 
-        $this->user          = $this->model('user');
-        $this->comments      = $this->model('comment');
-        $this->categories    = $this->model('category');
-        $this->comment_reply = $this->model('comment_reply');   
-        $this->likes         = $this->model('like');  
+    public $postManagement;
+
+    public function __construct(
+        \App\Cms\models\Post $post,
+        \App\Cms\helpers\Session $session,
+        \App\Cms\models\User $user,
+        \App\Cms\models\Comment $comment,
+        \App\Cms\models\Category $category,
+        \App\Cms\models\Comment_reply $comment_reply,
+        \App\Cms\models\Like $like,
+        \App\Cms\Services\PostManagement $postManagement
+    ) {
+        $this->post = $post;
+        $this->session = $session; 
+        $this->user = $user;
+        $this->comments = $comment;
+        $this->categories = $category;
+        $this->comment_reply = $comment_reply;   
+        $this->likes = $like;  
+        $this->postManagement = $postManagement;
     }
     
     public function index($id) 
@@ -54,26 +66,15 @@ class Posts extends BaseController {
         if (!$this->user->isAdmin()) {
             if($_SERVER['REQUEST_METHOD'] == "POST") { 
                 if(isset($_POST['reset'])) {
-                    $user = $this->user->find_by_id($_SESSION['id']);
-                    $user_posts = $user->posts;
-                    $count_rows = $user_posts->count(); 
-                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
-                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
-                    $data = [$user_posts,$pagination, $this->session->message];
-                    $this->view('sub_posts', $data);
+                    $this->resetGrid($id);
                 } else {
-                    $all_posts = $this->filtrTable(false,$_SESSION['id']);
-                    $count_rows = $all_posts->count();
-                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
-                    $data = [$pager->filtrData($_POST['searchTerm'],false,$_SESSION['id']),$pagination, $this->session->message];
-                    $this->view('sub_posts', $data);
+                    $this->searchTerm($id);
                 }
             } else {
                 $user = $this->user->find_by_id($_SESSION['id']);
-                $user_posts = $user->posts;
+                $user_posts = $user->post;
                 $count_rows = $user_posts->count(); 
-                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,false,$_SESSION['id']);
+                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->post,$id,false,$_SESSION['id']);
                 $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);
                 $data = [$user_posts,$pagination, $this->session->message];
                 $this->view('sub_posts', $data);
@@ -82,24 +83,14 @@ class Posts extends BaseController {
             /** filtrowanie tabeli */
             if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 if(isset($_POST['reset'])) {
-                    $all_posts = $this->posts->find_all_posts();
-                    $count_rows = $all_posts->count();
-                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
-                    $data = [$pager->data_per_page(),$pagination, $this->session->message];
-                    $this->view('adm_posts', $data);
+                    $this->resetGrid($id);
                 } else {
-                    $all_posts = $this->filtrTable(true);
-                    $count_rows = $all_posts->count();
-                    $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
-                    $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
-                    $data = [$pager->filtrData($_POST['searchTerm'],true),$pagination, $this->session->message];
-                    $this->view('adm_posts', $data);
+                    $this->searchTerm($id);
                 }     
             } else {
-                $all_posts = $this->posts->find_all_posts();
+                $all_posts = $this->post->find_all_posts();
                 $count_rows = $all_posts->count();
-                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->posts,$id,true);
+                $pager = new \App\Cms\helpers\Pager(POSTS_PER_PAGE,$this->post,$id,true);
                 $pagination = new \App\Cms\helpers\Pagination(5, $id, $count_rows);  
                 $data = [$pager->data_per_page(),$pagination, $this->session->message];
                 $this->view('adm_posts', $data);
@@ -126,17 +117,15 @@ class Posts extends BaseController {
             $data = [$pager->sortByQuery("authorAsc"),$pagination, $this->session->message];
             $this->view('adm_posts', $data);
         }
-        
-        
     }
 
-    public function filtrTable($isAdmin,$id=null) 
-    {
-        if(isset($_POST['search'])) {
-            $term = $_POST['searchTerm'];
-            return $this->posts->searchTable($term,$isAdmin,$id);
-        }
-    }
+    // public function filtrTable($isAdmin, $id=null) 
+    // {
+    //     if(isset($_POST['search'])) {
+    //         $term = $_POST['searchTerm'];
+    //         return $this->post->searchTable($term, $isAdmin, $id);
+    //     }
+    // }
     
     public function update($id) 
     {
@@ -335,5 +324,27 @@ class Posts extends BaseController {
         ];
 
         $this->view('search_post', $data);
+    }
+
+    private function resetGrid(int $postId)
+    {
+        $user = $this->user->find_by_id($_SESSION['id']);
+        $user_posts = $user->posts;
+        $count_rows = $user_posts->count(); 
+        $pagination = new \App\Cms\helpers\Pagination(5, $postId, $count_rows);
+        $data = [$user_posts, $pagination, $this->session->message];
+
+        return $this->view('adm_posts', $data);
+    }
+
+    private function searchTerm($nrPage)
+    {
+        $term = $_POST['searchTerm'];
+        $filteredData = $this->postManagement->filterData($term, (int) $_SESSION['id'], (int) $nrPage);
+        $rows = $this->postManagement->getAllFilterData($term)->count();
+        $pagination = new \App\Cms\helpers\Pagination(5, $nrPage, $rows);  
+        $data = [$filteredData, $pagination, $this->session->message];
+
+        return $this->view('adm_posts', $data);
     }
 }

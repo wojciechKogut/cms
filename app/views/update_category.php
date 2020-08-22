@@ -26,7 +26,7 @@ $the_category = $params[1];
     <div class="container mystyle">
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <form role="form" action="" id="addCategory" method="post" >
+            <form role="form" action="/categories/updateCategory/<?php echo $the_category->id ?>" id="addCategory" method="post" >
 
                 <?php if(!empty($form->form_values)): ?>
                 

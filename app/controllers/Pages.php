@@ -9,12 +9,20 @@ class Pages extends BaseController {
     public $user;
     public $comment;
     
-    public function __construct() {
-        $this->posts      = $this->model('post');
-        $this->categories = $this->model('category');
-        $this->user       = $this->model('user');
-        $this->comment    = $this->model('comment');
-        $this->likes      = $this->model('like');
+    public function __construct(
+        \App\Cms\helpers\Logger $logger,
+        \App\Cms\models\Post $post,
+        \App\Cms\models\Category $categories,
+        \App\Cms\models\User $user,
+        \App\Cms\models\Comment $comment,
+        \App\Cms\models\Like $like
+    ) {
+        $this->posts      = $post;
+        $this->categories = $categories;
+        $this->user       = $user;
+        $this->comment    = $comment;
+        $this->likes      = $like;
+        $this->logger     = $logger;
     }
     
     public function index($id = 1)
@@ -32,7 +40,7 @@ class Pages extends BaseController {
     
     public function admin()
     {
-        $session = $this->model('session');
+        $session = $this->session = new \App\Cms\helpers\Session();
         if ($session->session_check()) {
             $userLogged = $this->user::find($_SESSION['id']);
             $data = [

@@ -3,7 +3,7 @@ var loc = window.location.pathname;
 
 var dir = loc.split('/');
 
-console.log(dir[1]);
+var baseUrl = 'http://cms.local';
 
 
 var request = new XMLHttpRequest();
@@ -30,23 +30,23 @@ request.onreadystatechange = function () {
 
         switch (weather.list[0].weather[0].main) {
             case "Snow":
-                 weatherImg.src = 'http://localhost/' + dir[1] + '/images/snow.png';
+                 weatherImg.src = baseUrl + dir[1] + '/images/snow.png';
                 break;
             case "Clouds":
-                 weatherImg.src = 'http://localhost/' + dir[1] + '/images/cloud.png';
+                 weatherImg.src = baseUrl + dir[1] + '/images/cloud.png';
                 break;
             case "Rain":
-                 weatherImg.src = 'http://localhost/' + dir[1] + '/images/rain.png';
+                 weatherImg.src = baseUrl + dir[1] + '/images/rain.png';
                 break;
             case "Clear":
                 if (hours > 16) {
-                    weatherImg.src = 'http://localhost/' + dir[1] + '/images/cloud.png';
+                    weatherImg.src = baseUrl + dir[1] + '/images/cloud.png';
                 } else {
-                    weatherImg.src = 'http://localhost/' + dir[1] + '/images/clear.png';
+                    weatherImg.src = baseUrl + dir[1] + '/images/clear.png';
                 }
                 break;
             default:
-                weatherImg.src = 'http://localhost/' + dir[1] + '/images/clear.png';
+                weatherImg.src = baseUrl + dir[1] + '/images/clear.png';
         }
         document.getElementById('degree').innerHTML = temp;
         document.getElementById('city').innerHTML = city;
@@ -91,67 +91,67 @@ function timer() {
 setInterval(timer, 1000);
 
 
-$('#login-form').on('submit', (e) => {
-    e.preventDefault();
-    var form = document.getElementById("login-form");
-    var username = form.username.value;
-    var password = form.password.value;
-    var info = document.getElementsByClassName('info');
-    var user_regExp = /[a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{3,}/;
-    var pass_regExp = /.{4,20}/;
-    var errors = {
-        'username': '',
-        'password': ''
-    };
+// $('#login-form').on('submit', (e) => {
+//     e.preventDefault();
+//     var form = document.getElementById("login-form");
+//     var username = form.username.value;
+//     var password = form.password.value;
+//     var info = document.getElementsByClassName('info');
+//     var user_regExp = /[a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{3,}/;
+//     var pass_regExp = /.{4,20}/;
+//     var errors = {
+//         'username': '',
+//         'password': ''
+//     };
 
-    if (username == " " || username == null || !user_regExp.test(username)) {
-        info[0].style.color = "red";
-        errors['username'] = "Please fill username with at least 2 characters";
-        info[0].innerHTML = errors['username'];
-    }
-    else {
-        info[0].innerHTML = " ";
-    }
+//     if (username == " " || username == null || !user_regExp.test(username)) {
+//         info[0].style.color = "red";
+//         errors['username'] = "Please fill username with at least 2 characters";
+//         info[0].innerHTML = errors['username'];
+//     }
+//     else {
+//         info[0].innerHTML = " ";
+//     }
 
-    if (password == " " || password == null || !pass_regExp.test(password)) {
-        info[1].style.color = "red";
-        errors.password = "Empty password or to short";
-        info[1].innerHTML = errors.password;
-    }
-    else {
-        info[1].innerHTML = " ";
-    }
+//     if (password == " " || password == null || !pass_regExp.test(password)) {
+//         info[1].style.color = "red";
+//         errors.password = "Empty password or to short";
+//         info[1].innerHTML = errors.password;
+//     }
+//     else {
+//         info[1].innerHTML = " ";
+//     }
 
-    var i = 0;
+//     var i = 0;
 
-    for (var key in errors) {
-        if (errors[key] != "") i++;
-    }
+//     for (var key in errors) {
+//         if (errors[key] != "") i++;
+//     }
 
-    if (i === 0) {
-        let data = {
-            username: username,
-            password: password
-        };
+//     if (i === 0) {
+//         let data = {
+//             username: username,
+//             password: password
+//         };
 
-        $.ajax({
-            url: 'http://localhost/' + dir[1] + '/users/ajaxCheck/',
-            type: 'post',
-            data: data,
-            success: function (html) {
-                if (html.indexOf('admin') !== -1) {
-                    window.location = html;
-                } else {
-                    $('#loginErr').parent().css('display', 'block');
-                    $('#loginErr').text("Invalid username or password");
-                    $('#loginErr').addClass('alert alert-danger');
-                    form.reset();
-                }
-            }
-        });
-        return true;
-    } else return false;
-});
+//         $.ajax({
+//             url: baseUrl + dir[1] + '/users/ajaxCheck/',
+//             type: 'post',
+//             data: data,
+//             success: function (html) {
+//                 if (html.indexOf('admin') !== -1) {
+//                     window.location = html;
+//                 } else {
+//                     $('#loginErr').parent().css('display', 'block');
+//                     $('#loginErr').text("Invalid username or password");
+//                     $('#loginErr').addClass('alert alert-danger');
+//                     form.reset();
+//                 }
+//             }
+//         });
+//         return true;
+//     } else return false;
+// });
 
 
 // function verify() {
@@ -198,7 +198,7 @@ $('#login-form').on('submit', (e) => {
     //     };
 
     //     $.ajax({
-    //         url: 'http://localhost/' + dir[1] + '/users/ajaxCheck/',
+    //         url: baseUrl + dir[1] + '/users/ajaxCheck/',
     //         type: 'post',
     //         data: data,
     //         success: function (html) {
@@ -218,10 +218,6 @@ $('#login-form').on('submit', (e) => {
 // }
 
 
-
-
-
-
 function ajax() {
 
     var comment_author = $("#comment_author").val();
@@ -229,7 +225,6 @@ function ajax() {
     var comment_content = $('#comment_content').val();
     var comment_post_id = $("#post_id").val();
     var warning = $('#warning').val();
-
 
     if (comment_author != "" && comment_email != "" && comment_content != "") {
 
@@ -239,10 +234,11 @@ function ajax() {
             comment_content: comment_content,
             comment_post_id: comment_post_id
         };
-
+       
         $.ajax({
             type: "POST",
-            url: "http://localhost/" + dir[1] + "/comments/ajax/",
+            url: "http://cms.local/comments/ajax/",
+            dataType: 'json',
             data: dataString,
             cache: false,
             success: function (html) {
@@ -402,7 +398,7 @@ function reply_content(id) {
                     };
 
                     $.ajax({
-                        url: 'http://localhost/' + dir[1] + '/comments/reply/',
+                        url: baseUrl + dir[1] + '/comments/reply/',
                         method: 'post',
                         data: comment_data,
                         success: function (html) {
@@ -432,7 +428,7 @@ function like() {
     console.log(data.userId)
 
     $.ajax({
-        url: 'http://localhost/' + dir[1] + '/users/like/',
+        url: baseUrl + dir[1] + '/users/like/',
         type: "post",
         data: data,
         success: function(data1) {
