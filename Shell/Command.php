@@ -225,7 +225,7 @@ class Command
         $dbuser = "root";
         $dbpassword = "root";
 
-        return  new \PDO("mysql:host=".$dbhost.";dbname=".$dbname, $dbuser, $dbpassword);
+        return  new \PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USERNAME, DB_PASS);
     }
 }
 
